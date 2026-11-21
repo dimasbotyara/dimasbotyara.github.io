@@ -44,7 +44,9 @@
     Rust: "var(--orange)",
     Shell: "var(--green)",
     HTML: "var(--red)",
-    TypeScript: "var(--aqua)"
+    TypeScript: "var(--aqua)",
+    Markdown: "var(--fg3)",
+    "b-lang": "var(--yellow)"
   };
 
   // =========================================================================
@@ -318,7 +320,7 @@
               escapeHtml(item.lang) +
             "</span>" +
           "</div>" +
-          '<p class="shelf-desc">' + escapeHtml(item.desc[state.lang]) + "</p>" +
+          '<p class="shelf-desc">' + formatText(item.desc[state.lang]) + "</p>" +
           '<div class="shelf-tags">' + tagsHtml + "</div>" +
         "</a>"
       );
@@ -629,7 +631,38 @@
     var modeUntil = 0;
     var lastQuoteIdx = -1;
     var activeQuoteIdx = -1;
+    var quoteDeck = [];
     var reducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function nextShuffledQuoteIdx(total) {
+      if (quoteDeck.length === 0) {
+        for (var i = 0; i < total; i++) quoteDeck.push(i);
+        // Fisher-Yates shuffle
+        for (var j = quoteDeck.length - 1; j > 0; j--) {
+          var k = Math.floor(Math.random() * (j + 1));
+          var tmp = quoteDeck[j];
+          quoteDeck[j] = quoteDeck[k];
+          quoteDeck[k] = tmp;
+        }
+        // Avoid repeating the previous quote right across deck boundaries
+        if (quoteDeck.length > 1 && quoteDeck[quoteDeck.length - 1] === lastQuoteIdx) {
+          var swap = quoteDeck[0];
+          quoteDeck[0] = quoteDeck[quoteDeck.length - 1];
+          quoteDeck[quoteDeck.length - 1] = swap;
+        }
+      }
+      return quoteDeck.pop();
+    }
+
+    function formatCrabLine(str) {
+      return escapeHtml(str).replace(/\[\[swatch:([^\]]+)\]\]/g, function (_, rawColor) {
+        var c = rawColor.trim();
+        if (!/^(#[0-9a-fA-F]{3,8}|rgb\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*\))$/.test(c)) {
+          return "";
+        }
+        return '<span class="crab-swatch" style="background:' + c + '" title="' + c + '" aria-hidden="true"></span>';
+      });
+    }
 
     function randRange(min, max) {
       return min + Math.random() * (max - min);
@@ -651,7 +684,7 @@
 
     function showSpeech(text) {
       if (!bubbleBar || !speech) return;
-      speech.textContent = text;
+      speech.innerHTML = formatCrabLine(text);
       speech.classList.toggle("is-emoji", isSingleEmoji(text));
       bubbleBar.hidden = false;
     }
@@ -697,15 +730,13 @@
 
     boopCrab = function () {
       var quotes = t("crab.quotes") || ["🦀"];
-      var idx = Math.floor(Math.random() * quotes.length);
-      if (quotes.length > 1 && idx === lastQuoteIdx) {
-        idx = (idx + 1 + Math.floor(Math.random() * (quotes.length - 1))) % quotes.length;
-      }
+      var idx = nextShuffledQuoteIdx(quotes.length);
       lastQuoteIdx = idx;
       activeQuoteIdx = idx;
 
       var line = quotes[idx];
-      var readDuration = isSingleEmoji(line) ? 2400 : Math.min(5400, 2600 + line.length * 42);
+      var plainLen = line.replace(/\[\[swatch:[^\]]+\]\]/g, "").length;
+      var readDuration = isSingleEmoji(line) ? 2400 : Math.min(5800, 2700 + plainLen * 44);
 
       // Stop and stand still while chatting!
       mode = "talking";

@@ -68,6 +68,9 @@ const SITE_DATA = {
         quotes: [
           "димас ботяра считает меня очаровашкой, но вообще-то я могу и цапнуть на 10 урона...",
           "я приливной краб из pygame-slide-survivors, между прочим!",
+          "димас ботяра любит catppuccin mocha, gruvbox, ayu... да в целом, много чего 😅",
+          "мой любимый цвет — rgb(223, 152, 116) [[swatch:rgb(223, 152, 116)]]",
+          "мой самый нелюбимый цвет — #ff00ff [[swatch:#ff00ff]] (буквально сломанная текстура 😭)",
           "клац-клац 🦀",
           "🦀",
           "у меня 50 hp и радиус удара 46 пикселей. имей в виду.",
@@ -79,13 +82,34 @@ const SITE_DATA = {
           "я бы убежал на берег, но тут в gruvbox слишком уютно",
           "тыкнешь ещё раз — сделаю замах 0.32 сек...",
           "🌊",
-          "мой любимый цвет — rgb(223, 152, 116)",
+          "мои глаза — rgb(255, 237, 121) [[swatch:rgb(255, 237, 121)]], светятся даже в темноте!",
           "сижу тут, чиллю, никого не трогаю (пока)",
           "🥺",
           "бульк... ой, это прилив",
           "✨",
           "передаю привет старому hp pavilion на core 2 duo!",
-          "хожу боком, потому что могу"
+          "хожу боком, потому что могу",
+          "слышал про b-lang? пчёлам язык программирования сделали, а крабам — нет 😤",
+          "пытался скрафтить краба в alchemy-matcher... 582 элемента, а меня там нет 🥺",
+          "28 паверапов в botyarapong — это перебор? димас так не считает",
+          "проиграл все фейк-рубли в botyaracasino. благо не настоящие",
+          "🫧",
+          "заходи в локалку в botyaratalk, пообщаемся голосом через rnnoise",
+          "если услышишь «клац-клац» в дискорде — это я через botyaraPAD",
+          "botyaraREC сначала пишет RAW, чтобы слабый ноут не задымился",
+          "я даже на школьных компах с alt linux бывал через флешку!",
+          "в cli-anims есть аквариум в терминале — там мои дальние родственники",
+          "touch grass? permission denied. а вот touch sand — всегда пожалуйста",
+          "батарея 0% [AC Connected] — это не баг, это стиль жизни",
+          "🏖️",
+          "в botyaraRTS 10 тысяч строк чистого pygame... а меня туда не позвали",
+          "алтай. пчёлы. мёд. а как же море и крабы?!",
+          "обыграл бы stockfish в botyarachess, но клешнями неудобно двигать пешки",
+          "fish 4.9.3 — отличный шелл, одобрено морскими жителями 🐟",
+          "читаю каждый diff... ну, насколько позволяют два жёлтых пикселя вместо глаз",
+          "попробуй нажать T — переключишь тему, и мне станет светло или темно!",
+          "⚡",
+          "я местный житель биома coast. без прописки, зато на чистом pygame!"
         ]
       },
       terminal: {
@@ -258,6 +282,9 @@ const SITE_DATA = {
         quotes: [
           "dimasbotyara thinks i'm a cutie, but i can totally pinch for 10 damage...",
           "i'm the tide crab straight outta pygame-slide-survivors, btw!",
+          "dimasbotyara loves catppuccin mocha, gruvbox, ayu... honestly, quite a lot of themes 😅",
+          "my favorite color is rgb(223, 152, 116) [[swatch:rgb(223, 152, 116)]]",
+          "my least favorite color is #ff00ff [[swatch:#ff00ff]] (literally a missing texture 😭)",
           "snip-snip 🦀",
           "🦀",
           "50 hp and a 46px strike radius. just saying.",
@@ -269,13 +296,34 @@ const SITE_DATA = {
           "would crawl back to the coast, but gruvbox is way too cozy",
           "boop me one more time and i'll do my 0.32s windup...",
           "🌊",
-          "favorite color: rgb(223, 152, 116)",
+          "my eyes are rgb(255, 237, 121) [[swatch:rgb(255, 237, 121)]] — glow in the dark!",
           "just vibing here, pinching nobody (yet)",
           "🥺",
           "bloop... oh, that's the tide",
           "✨",
           "shoutout to the legendary core 2 duo hp pavilion!",
-          "walking sideways because i can"
+          "walking sideways because i can",
+          "heard of b-lang? bees got their own programming language, where's crab-lang 😤",
+          "tried crafting a crab in alchemy-matcher... 582 items and still no me 🥺",
+          "28 power-ups in botyarapong — overkill? dimas doesn't think so",
+          "lost all my fake rubles in botyaracasino. good thing they're fake",
+          "🫧",
+          "hop on LAN in botyaratalk, let's voice chat with local rnnoise",
+          "if you hear snip-snip on discord, that's me via botyaraPAD",
+          "botyaraREC records RAW first so weak laptops don't catch fire",
+          "i've even visited school ALT Linux PCs via a USB stick!",
+          "cli-anims has a terminal aquarium — my distant cousins live there",
+          "touch grass? permission denied. touch sand? anytime",
+          "battery 0% [AC Connected] — not a bug, a lifestyle",
+          "🏖️",
+          "botyaraRTS has 10k lines of pure pygame... and still didn't invite me",
+          "altai. bees. honey. what about the ocean and crabs?!",
+          "i'd beat stockfish in botyarachess, if only claws could hold pawns",
+          "fish 4.9.3 — solid shell, approved by sea creatures 🐟",
+          "i read every diff... well, as much as two yellow pixels for eyes allow",
+          "try pressing T — flips the theme between dark and light gruvbox!",
+          "⚡",
+          "official coast biome resident. zero engine bloat, pure pygame!"
         ]
       },
       terminal: {
@@ -855,6 +903,116 @@ const SITE_DATA = {
       desc: {
         ru: "красивые десктопные часы на pygame с одометр-анимацией цифр и искрами частиц на каждом тике.",
         en: "eye-candy desktop clock on pygame with odometer-style digit transitions, particle bursts every tick, and 10 themes."
+      }
+    },
+    {
+      name: "botyaratalk-desktop",
+      url: "https://github.com/dimasbotyara/botyaratalk-desktop",
+      cat: "selfhosted",
+      lang: "Rust",
+      tags: ["tauri 2", "rust", "LAN"],
+      desc: {
+        ru: "десктопный клиент для botyaratalk на tauri 2 + rust: открывает твой LAN-сервер в системном webview, добавляет индикатор микрофона в трее, глобальный мут и уведомления.",
+        en: "desktop client for botyaratalk built with tauri 2 + rust — opens your LAN server in system webview with a tray mic indicator, global mute hotkey & native notifications."
+      }
+    },
+    {
+      name: "botyaraemoji",
+      url: "https://github.com/dimasbotyara/botyaraemoji",
+      cat: "selfhosted",
+      lang: "JavaScript",
+      tags: ["emoji", "flask", "self-hosted"],
+      desc: {
+        ru: "локальный веб-пикер эмодзи на flask — листаешь по категориям и копируешь в один клик, настройки хранятся локально. без облаков и аккаунтов.",
+        en: "self-hosted web emoji picker on flask — browse emojis by category and copy in one click with local settings persistence. no cloud, no accounts."
+      }
+    },
+    {
+      name: "donjuan-flask",
+      url: "https://github.com/dimasbotyara/donjuan-flask",
+      cat: "games",
+      lang: "Python",
+      tags: ["fork", "dungeons", "tabletop"],
+      desc: {
+        ru: "форк генератора подземелий на flask для настольных ролевых игр.",
+        en: "fork of a modern flask tool for generating dungeons for tabletop rpgs."
+      }
+    },
+    {
+      name: "cipher-cascade",
+      url: "https://github.com/dimasbotyara/cipher-cascade",
+      cat: "linux",
+      lang: "Python",
+      tags: ["terminal", "matrix", "pure-python"],
+      desc: {
+        ru: "киберпанк-водопад из слов в терминале: режимы водопада, декодера, матрицы и слайда, градиентные темы (rainbow, fire, ice, neon) и управление скоростью.",
+        en: "cyberpunk word waterfall in the terminal — waterfall, decoder, matrix & slide modes, gradient themes (rainbow, fire, ice, neon) and speed controls. pure python."
+      }
+    },
+    {
+      name: "botyaramatch",
+      url: "https://github.com/dimasbotyara/botyaramatch",
+      cat: "linux",
+      lang: "Python",
+      tags: ["fuzzy-match", "EN/RU", "library"],
+      desc: {
+        ru: "поиск ближайшей строки на python: левенштейн, джаро-винклер, триграммы, нормализация ё/е и автоисправление перепутанной раскладки EN/RU.",
+        en: "find the closest matching string in python: levenshtein, jaro-winkler, trigrams, ё/е normalization, and EN/RU keyboard layout fixing."
+      }
+    },
+    {
+      name: "botyaraclock",
+      url: "https://github.com/dimasbotyara/botyaraclock",
+      cat: "linux",
+      lang: "Python",
+      tags: ["pyqt6", "binary-clock", "pomodoro"],
+      desc: {
+        ru: "десктопные часы на pyqt6: аналоговый, цифровой и бинарный (bcd) циферблаты, секундомер с кругами, таймер с пресетами, встроенный помодоро и темы.",
+        en: "feature-rich desktop clock on pyqt6 — analog, digital & binary (bcd) faces, precision stopwatch with laps, timer presets, built-in pomodoro & themes."
+      }
+    },
+    {
+      name: "botyaracalc",
+      url: "https://github.com/dimasbotyara/botyaracalc",
+      cat: "linux",
+      lang: "Python",
+      tags: ["pyqt5", "scientific", "RU/EN"],
+      desc: {
+        ru: "десктопный калькулятор на pyqt5 — инженерный режим, панель истории, темы, RU/EN интерфейс и сохранение настроек в json.",
+        en: "modern desktop calculator on pyqt5 — scientific mode, history panel, themes, bilingual RU/EN interface, and json-persisted settings."
+      }
+    },
+    {
+      name: "b-lang-more-examples",
+      url: "https://github.com/dimasbotyara/b-lang-more-examples",
+      cat: "weird",
+      lang: "b-lang",
+      tags: ["bees 🐝", "examples", "b-lang"],
+      desc: {
+        ru: "сборник примеров программ на пчелином языке b-lang: калькулятор, фибоначчи, fizzbuzz, квиз, генератор паролей, обратный отсчёт и таблица умножения.",
+        en: "example programs for the bee-themed b language: calculator, fibonacci, fizzbuzz, quiz, password generator, countdown, multiplication table and more."
+      }
+    },
+    {
+      name: "dimasbotyara",
+      url: "https://github.com/dimasbotyara/dimasbotyara",
+      cat: "weird",
+      lang: "Markdown",
+      tags: ["readme", "fastfetch", "profile"],
+      desc: {
+        ru: "тот самый профиль-readme на github — с `touch grass: permission denied`, легендарным fastfetch от старого hp pavilion и змейкой коммитов.",
+        en: "my github profile readme — featuring `touch grass: permission denied`, the legendary core 2 duo hp pavilion fastfetch, and the contribution snake."
+      }
+    },
+    {
+      name: "dimasbotyara.github.io",
+      url: "https://github.com/dimasbotyara/dimasbotyara.github.io",
+      cat: "weird",
+      lang: "JavaScript",
+      tags: ["this site 🐸", "gruvbox", "RU/EN"],
+      desc: {
+        ru: "эта самая визитка, на которой ты сейчас сидишь — gruvbox dark/light, два языка, терминал, приливной краб и ноль сборщиков.",
+        en: "the exact personal page you're looking at right now — gruvbox dark/light, bilingual RU/EN, interactive terminal, tide crab, zero build tools."
       }
     },
     {
