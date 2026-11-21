@@ -6,14 +6,32 @@
   <title>dimasbotyara — просто визитка</title>
   <meta name="description" content="привет, я димас ботяра. делаю игры на pygame, self-hosted штуки для локалки и утилиты под линукс. gruvbox внутри." />
   <meta name="theme-color" content="#282828" />
+  <link rel="canonical" href="https://dimasbotyara.github.io/" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 
-  <!-- Anti-FOUC: apply saved theme (default gruvbox dark) & browser/saved locale immediately -->
+  <!-- Open Graph & Twitter Card preview -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="dimasbotyara" />
+  <meta property="og:url" content="https://dimasbotyara.github.io/" />
+  <meta property="og:title" content="dimasbotyara — personal page &amp; 49 projects" />
+  <meta property="og:description" content="pure pygame games, self-hosted LAN apps, linux tools, interactive fish terminal &amp; pixel wildlife. gruvbox inside." />
+  <meta property="og:image" content="https://dimasbotyara.github.io/assets/og-card.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="dimasbotyara.github.io — Gruvbox personal homepage with pixel frog and Tide Crab" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="dimasbotyara — personal page &amp; 49 projects" />
+  <meta name="twitter:description" content="pure pygame games, self-hosted LAN apps, linux tools, interactive fish terminal &amp; pixel wildlife. gruvbox inside." />
+  <meta name="twitter:image" content="https://dimasbotyara.github.io/assets/og-card.png" />
+
+  <!-- Anti-FOUC: apply saved palette (default gruvbox dark) & browser/saved locale immediately -->
   <script>
     (function () {
       try {
+        var validThemes = { dark: 1, light: 1, catppuccin: 1, ayu: 1, nord: 1 };
         var savedTheme = localStorage.getItem("dimas_theme");
-        var theme = (savedTheme === "light" || savedTheme === "dark") ? savedTheme : "dark";
+        var theme = validThemes[savedTheme] ? savedTheme : "dark";
         document.documentElement.setAttribute("data-theme", theme);
 
         var params = new URLSearchParams(window.location.search);
@@ -49,11 +67,11 @@
     })();
   </script>
 
-  <!-- Distinct fonts: Unbounded, Silkscreen (+ Press Start 2P Cyrillic pixel fallback), JetBrains Mono, Rubik, Caveat -->
+  <!-- 5 distinct fonts (all Cyrillic + Latin): Unbounded, Press Start 2P, JetBrains Mono, Rubik, Caveat -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&family=Press+Start+2P&family=Rubik:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Silkscreen:wght@400;700&family=Unbounded:wght@500;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&family=Press+Start+2P&family=Rubik:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Unbounded:wght@500;700;800&display=swap"
     rel="stylesheet"
   />
 
@@ -100,19 +118,50 @@
           <button type="button" class="lang-btn" data-lang="en" aria-pressed="false">en</button>
         </div>
 
-        <!-- Theme Switcher (Gruvbox Dark / Light) -->
-        <button type="button" class="icon-btn theme-btn" id="themeToggle" aria-label="toggle gruvbox theme" title="toggle theme">
-          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="4"></circle>
-            <path d="M12 2v2"></path><path d="M12 20v2"></path>
-            <path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path>
-            <path d="M2 12h2"></path><path d="M20 12h2"></path>
-            <path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path>
+        <!-- Visible Palette Switcher (Gruvbox Dark / Light / Catppuccin Mocha / Ayu Mirage / Nord) -->
+        <div class="theme-picker" id="themePicker">
+          <button
+            type="button"
+            class="icon-btn theme-btn"
+            id="themeToggle"
+            aria-haspopup="menu"
+            aria-expanded="false"
+            aria-controls="themeMenu"
+            aria-label="pick color palette"
+            title="pick palette"
+          >
+            <span class="theme-mini-dots" aria-hidden="true">
+              <i style="background:var(--yellow)"></i>
+              <i style="background:var(--green)"></i>
+              <i style="background:var(--purple)"></i>
+            </span>
+            <span class="theme-label" id="themeLabel">gruvbox</span>
+            <svg class="theme-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="m6 9 6 6 6-6"></path>
+            </svg>
+          </button>
+          <div class="theme-menu" id="themeMenu" role="menu" hidden></div>
+        </div>
+
+        <!-- Subtle Micro-SFX Toggle (muted by default) -->
+        <button
+          type="button"
+          class="icon-btn sound-btn"
+          id="soundToggle"
+          aria-pressed="false"
+          aria-label="toggle micro-sounds"
+          title="toggle sound"
+        >
+          <svg class="icon-sound-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M11 5 6 9H2v6h4l5 4V5Z"></path>
+            <path d="m22 9-6 6"></path>
+            <path d="m16 9 6 6"></path>
           </svg>
-          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+          <svg class="icon-sound-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M11 5 6 9H2v6h4l5 4V5Z"></path>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
           </svg>
-          <span class="theme-label" id="themeLabel">dark</span>
         </button>
 
         <!-- GitHub shortcut -->
@@ -263,7 +312,7 @@
           <div class="terminal-chips" id="termChips" aria-label="quick commands"></div>
         </div>
 
-        <!-- Pixel Tide Crab (Приливной краб) straight from pygame-slide-survivors/wildlife.py -->
+        <!-- Pixel Tide Crab + Visiting Residents straight from pygame-slide-survivors/wildlife.py -->
         <div class="crab-habitat" id="crabHabitat">
           <div class="crab-header">
             <div class="crab-title-group">
@@ -276,17 +325,46 @@
                 data-i18n="crab.from"
               >из slide survivors</a>
             </div>
-            <span class="crab-hint-tag" data-i18n="crab.hint">тыкни крабика</span>
+            <button type="button" class="guest-pill" id="guestBadge" hidden></button>
+            <span class="crab-hint-tag" id="crabHintTag" data-i18n="crab.hint">тыкни крабика</span>
           </div>
 
           <div class="crab-bubble-bar" id="crabBubbleBar" hidden>
+            <span class="crab-speaker" id="crabSpeaker"></span>
             <span class="crab-speech" id="crabSpeech" role="status" aria-live="polite"></span>
           </div>
 
-          <div class="crab-stage" id="crabStage" role="button" tabindex="0" aria-label="Tide Crab">
+          <div class="crab-stage" id="crabStage">
             <div class="crab-water" aria-hidden="true"></div>
             <div class="crab-sand" aria-hidden="true"></div>
-            <div class="crab-actor" id="crabActor">
+
+            <!-- Visiting pixel resident (flyers, hopper, crawler) -->
+            <button
+              type="button"
+              class="wildlife-guest"
+              id="guestActor"
+              hidden
+              aria-label="Visiting resident"
+            >
+              <svg
+                id="guestSvg"
+                class="crab-svg"
+                viewBox="0 0 11 9"
+                shape-rendering="crispEdges"
+                width="44"
+                height="36"
+                aria-hidden="true"
+              ></svg>
+              <span class="guest-shadow" id="guestShadow" aria-hidden="true"></span>
+            </button>
+
+            <!-- Permanent resident: Tide Crab -->
+            <button
+              type="button"
+              class="crab-actor"
+              id="crabActor"
+              aria-label="Tide Crab"
+            >
               <svg
                 id="crabSvg"
                 class="crab-svg"
@@ -297,7 +375,7 @@
                 aria-hidden="true"
               ></svg>
               <span class="crab-shadow" aria-hidden="true"></span>
-            </div>
+            </button>
           </div>
         </div>
       </div>

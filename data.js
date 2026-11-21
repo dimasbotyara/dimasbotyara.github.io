@@ -12,8 +12,55 @@ const SITE_DATA = {
   discordCopyValue: "dimas888",
   totalRepos: 49,
 
+  // Color palettes (Gruvbox Dark default + Gruvbox Light + Catppuccin Mocha + Ayu Mirage + Nord)
+  themes: [
+    {
+      id: "dark",
+      short: "gruvbox",
+      name: { ru: "gruvbox dark", en: "gruvbox dark" },
+      themeColor: "#282828",
+      aliases: ["gruvbox", "gruvbox-dark", "dark", "gd"],
+      swatches: ["#282828", "#fabd2f", "#b8bb26", "#fb4934"]
+    },
+    {
+      id: "light",
+      short: "light",
+      name: { ru: "gruvbox light", en: "gruvbox light" },
+      themeColor: "#fbf1c7",
+      aliases: ["gruvbox-light", "light", "gl"],
+      swatches: ["#fbf1c7", "#af3a03", "#79740e", "#076678"]
+    },
+    {
+      id: "catppuccin",
+      short: "mocha",
+      name: { ru: "catppuccin mocha", en: "catppuccin mocha" },
+      themeColor: "#1e1e2e",
+      aliases: ["catppuccin", "catppuccin-mocha", "mocha", "cat"],
+      swatches: ["#1e1e2e", "#cba6f7", "#a6e3a1", "#f38ba8"]
+    },
+    {
+      id: "ayu",
+      short: "ayu",
+      name: { ru: "ayu mirage", en: "ayu mirage" },
+      themeColor: "#1f2430",
+      aliases: ["ayu", "ayu-mirage", "mirage"],
+      swatches: ["#1f2430", "#ffcc66", "#73d0ff", "#ffad66"]
+    },
+    {
+      id: "nord",
+      short: "nord",
+      name: { ru: "nord", en: "nord" },
+      themeColor: "#2e3440",
+      aliases: ["nord", "arctic"],
+      swatches: ["#2e3440", "#88c0d0", "#a3be8c", "#ebcb8b"]
+    }
+  ],
+
   // Exact pixel data & palette from dimasbotyara/pygame-slide-survivors (wildlife.py -> tide_crab)
   tideCrab: {
+    id: "tide_crab",
+    biome: "coast",
+    movement: "crawler",
     baseColor: [223, 152, 116],       // 1: body (#df9874)
     highlightColor: [255, 192, 156],  // 2: body + 40 clamped (#ffc09c)
     eyeColor: [255, 237, 121],        // 3: eye (#ffed79)
@@ -29,6 +76,101 @@ const SITE_DATA = {
     ]
   },
 
+  // Visiting residents — exact pixel sprites, colors & animation modes from pygame-slide-survivors/wildlife.py
+  wildlife: [
+    {
+      id: "clover_moth",
+      biome: "meadow",
+      movement: "flyer",
+      baseColor: [141, 207, 106],
+      highlightColor: [181, 247, 146],
+      eyeColor: [255, 237, 121],
+      darkColor: [44, 35, 55],
+      pixels: [
+        "22.....22",
+        "212...212",
+        "211141112",
+        ".2114112.",
+        "..33333..",
+        ".1141411.",
+        "211.4.112"
+      ]
+    },
+    {
+      id: "echo_bat",
+      biome: "cavern",
+      movement: "flyer",
+      baseColor: [181, 142, 220],
+      highlightColor: [221, 182, 255],
+      eyeColor: [255, 237, 121],
+      darkColor: [44, 35, 55],
+      pixels: [
+        "2.......2",
+        "21.1.1.12",
+        "211111112",
+        ".2134312.",
+        "..11111..",
+        "..2.1.2..",
+        "....2...."
+      ]
+    },
+    {
+      id: "rune_wisp",
+      biome: "ruins",
+      movement: "flyer",
+      baseColor: [171, 191, 116],
+      highlightColor: [211, 231, 156],
+      eyeColor: [255, 237, 121],
+      darkColor: [44, 35, 55],
+      pixels: [
+        "....2....",
+        "...212...",
+        "..21112..",
+        ".2134312.",
+        "..21412..",
+        "...212...",
+        "..2.1.2..",
+        ".2...2..."
+      ]
+    },
+    {
+      id: "reed_toad",
+      biome: "marsh",
+      movement: "hopper",
+      baseColor: [113, 173, 98],
+      highlightColor: [153, 213, 138],
+      eyeColor: [255, 237, 121],
+      darkColor: [44, 35, 55],
+      pixels: [
+        "..33.33..",
+        ".2141412.",
+        ".2111112.",
+        "111444111",
+        ".2222222.",
+        "..11111..",
+        "222...222"
+      ]
+    },
+    {
+      id: "cinder_slug",
+      biome: "basalt",
+      movement: "crawler",
+      baseColor: [221, 107, 76],
+      highlightColor: [255, 147, 116],
+      eyeColor: [255, 237, 121],
+      darkColor: [44, 35, 55],
+      pixels: [
+        "2.2......",
+        "1.1..22..",
+        "333.2112.",
+        "111211412",
+        "111141411",
+        ".22111111",
+        "..2222222"
+      ]
+    }
+  ],
+
   i18n: {
     ru: {
       pageTitle: "dimasbotyara — просто визитка",
@@ -40,7 +182,10 @@ const SITE_DATA = {
         about: "обо мне",
         stack: "стек"
       },
-      themeTooltip: "сменить тему (клавиша T)",
+      themeTooltip: "выбрать палитру (клавиша T — следующая)",
+      themeMenuTitle: "палитры",
+      soundOnTooltip: "звуки включены — нажми, чтобы выключить",
+      soundOffTooltip: "звуки выключены — нажми, чтобы включить",
       langTooltip: "сменить язык (клавиша L)",
       hero: {
         badge: "i use arch btw",
@@ -107,10 +252,78 @@ const SITE_DATA = {
           "обыграл бы stockfish в botyarachess, но клешнями неудобно двигать пешки",
           "fish 4.9.3 — отличный шелл, одобрено морскими жителями 🐟",
           "читаю каждый diff... ну, насколько позволяют два жёлтых пикселя вместо глаз",
-          "попробуй нажать T — переключишь тему, и мне станет светло или темно!",
+          "попробуй нажать T или сменить палитру сверху — вдруг тут даже catppuccin mocha есть!",
           "⚡",
           "я местный житель биома coast. без прописки, зато на чистом pygame!"
         ]
+      },
+      wildlife: {
+        visitingLabel: "в гостях:",
+        clover_moth: {
+          name: "клеверный мотылёк",
+          quotes: [
+            "фыр-фыр! я клеверный мотылёк из биома meadow в slide survivors 🦋",
+            "залетел погреться на свет твоего монитора... у тебя тут уютная палитра!",
+            "у меня всего 18 hp, зато скорость 105! попробуй догони ✨",
+            "мой любимый цвет — зелёный клевер rgb(141, 207, 106) [[swatch:rgb(141, 207, 106)]]",
+            "если не будешь на меня тыкать 20 секунд — я полечу дальше по делам 🍃",
+            "приливной краб снизу прикольный, но летать не умеет 🤭",
+            "🦋",
+            "видал b-lang? пчёлы — мои дальние соседи по лугу!"
+          ]
+        },
+        echo_bat: {
+          name: "гулкая мышь",
+          quotes: [
+            "пи-и-ик! я гулкая мышь из пещер pygame-slide-survivors 🦇",
+            "выпустил бы два снаряда под углами -0.15 и +0.15, но сегодня выходной",
+            "мой оттенок — пещерный фиолетовый rgb(181, 142, 220) [[swatch:rgb(181, 142, 220)]]",
+            "если включишь светлую тему — я прищурюсь, предупреждаю 👀",
+            "ориентируюсь по эхолокации... тут пахнет python и arch linux!",
+            "🦇",
+            "у меня 20 hp и ноль желания трогать траву",
+            "повисим ещё чуток? не тронешь 20 секунд — полечу обратно в пещеру"
+          ]
+        },
+        rune_wisp: {
+          name: "рунный огонёк",
+          quotes: [
+            "ш-ш-ш... я рунный огонёк из древних руин slide survivors ✨",
+            "могу проходить сквозь стены, но решил зависнуть прямо в твоём браузере",
+            "свечусь ровно на rgb(171, 191, 116) [[swatch:rgb(171, 191, 116)]] — энергосберегающий!",
+            "33 hp, класс ghost, 0 облачных серверов",
+            "я видел все 49 репозиториев димаса... некоторые реально древние руины 🤭",
+            "✨",
+            "не бойся, я не кусаюсь... пока радиус не 31 пиксель",
+            "поболтаем ещё или мне парить дальше по сайту?"
+          ]
+        },
+        reed_toad: {
+          name: "камышовая жаба",
+          quotes: [
+            "квак! я камышовая жаба из болота slide survivors 🐸",
+            "видишь пиксельную лягуху в шапке сайта? это мой двоюродный брат!",
+            "могу плюнуть на 196 пикселей, но в гостях веду себя культурно",
+            "болотная классика — rgb(113, 173, 98) [[swatch:rgb(113, 173, 98)]] 💚",
+            "🐸",
+            "запрыгнул проведать приливного краба. у него тут песочек, а у меня камыши",
+            "i use arch btw... то есть квак!",
+            "посижу тут немного — если не тыкать 20 сек, упрыгаю обратно на болото"
+          ]
+        },
+        cinder_slug: {
+          name: "шлаковый слизень",
+          quotes: [
+            "пшшш... я шлаковый слизень из базальтового биома 🔥",
+            "осторожнее, я вообще-то взрываюсь на 18 урона в радиусе 65px (но тут тихо!)",
+            "ползу со скоростью 48, зато максимально вальяжно",
+            "мой тёплый цвет — тлеющий уголёк rgb(221, 107, 76) [[swatch:rgb(221, 107, 76)]]",
+            "горячее меня только старый hp pavilion при сборке rust 😭",
+            "🔥",
+            "приливной краб переживает, что я подпалю ему песок. не бойся, краб!",
+            "если забудешь про меня на 20 секунд — неспешно уползу дальше"
+          ]
+        }
       },
       terminal: {
         title: "fish 4.9.3 — dimasbotyara@archlinux",
@@ -243,7 +456,7 @@ const SITE_DATA = {
       favBadgeGame: "любимый рогалик",
       favBadgePong: "чистый хаос",
       favBadgeCloud: "мой lan-диск",
-      favBadgeJump: "редактор уровней",
+      favBadgeJump: "прыг-прыг",
       desktopClientNote: "+ десктоп-клиент на tauri/rust",
       siteCardNote: "визитка игры"
     },
@@ -258,7 +471,10 @@ const SITE_DATA = {
         about: "about",
         stack: "stack"
       },
-      themeTooltip: "toggle theme (press T)",
+      themeTooltip: "pick a palette (press T for next)",
+      themeMenuTitle: "palettes",
+      soundOnTooltip: "micro-sounds on — click to mute",
+      soundOffTooltip: "micro-sounds muted — click to enable",
       langTooltip: "switch language (press L)",
       hero: {
         badge: "i use arch btw",
@@ -325,10 +541,78 @@ const SITE_DATA = {
           "i'd beat stockfish in botyarachess, if only claws could hold pawns",
           "fish 4.9.3 — solid shell, approved by sea creatures 🐟",
           "i read every diff... well, as much as two yellow pixels for eyes allow",
-          "try pressing T — flips the theme between dark and light gruvbox!",
+          "try pressing T or the palette switcher up top — there's even catppuccin mocha in here!",
           "⚡",
           "official coast biome resident. zero engine bloat, pure pygame!"
         ]
+      },
+      wildlife: {
+        visitingLabel: "visiting:",
+        clover_moth: {
+          name: "clover moth",
+          quotes: [
+            "flutter! i'm the clover moth from the meadow biome in slide survivors 🦋",
+            "flew over to vibe by your screen glow... cozy color palette you got here!",
+            "only 18 hp, but 105 speed! good luck catching me ✨",
+            "my favorite shade is clover green rgb(141, 207, 106) [[swatch:rgb(141, 207, 106)]]",
+            "don't boop me for 20 seconds and i'll flutter off to somewhere else 🍃",
+            "tide crab down there is cool and all, but can he fly? nope 🤭",
+            "🦋",
+            "seen b-lang? the bees are basically my meadow neighbors!"
+          ]
+        },
+        echo_bat: {
+          name: "echo bat",
+          quotes: [
+            "squeak! i'm the echo bat from the cavern biome in pygame-slide-survivors 🦇",
+            "could fire twin shots at -0.15 and +0.15 rad, but i'm off duty today",
+            "cavern purple is my vibe: rgb(181, 142, 220) [[swatch:rgb(181, 142, 220)]]",
+            "switch to light theme and i will squint at you, fair warning 👀",
+            "echolocating... smells like pure python and arch linux in here!",
+            "🦇",
+            "20 hp and zero intention of touching grass",
+            "hang out a bit? leave me idle for 20s and i'll swoop back to the cave"
+          ]
+        },
+        rune_wisp: {
+          name: "rune wisp",
+          quotes: [
+            "whoooosh... i'm the rune wisp from the ruins biome in slide survivors ✨",
+            "i can phase through walls, yet i chose to haunt your browser tab",
+            "glowing at exactly rgb(171, 191, 116) [[swatch:rgb(171, 191, 116)]] — eco-friendly!",
+            "33 hp, ghost archetype, zero cloud servers",
+            "i've drifted through all 49 repos... some really are ancient ruins 🤭",
+            "✨",
+            "don't worry, i don't bite... unless you step inside 31 pixels",
+            "wanna chat more or should i drift off along the page?"
+          ]
+        },
+        reed_toad: {
+          name: "reed toad",
+          quotes: [
+            "ribbit! i'm the reed toad from the marsh biome in slide survivors 🐸",
+            "see that pixel frog in the topbar? that's my cousin!",
+            "i've got 196px spit range, but i'm polite when visiting",
+            "classic marsh green — rgb(113, 173, 98) [[swatch:rgb(113, 173, 98)]] 💚",
+            "🐸",
+            "hopped over to check on tide crab. he's got sand, i've got reeds",
+            "i use arch btw... i mean, ribbit!",
+            "chilling here for a bit — ignore me for 20s and i'll hop back to the marsh"
+          ]
+        },
+        cinder_slug: {
+          name: "cinder slug",
+          quotes: [
+            "pssshhh... i'm the cinder slug from the basalt biome 🔥",
+            "careful, i technically explode for 18 damage in a 65px radius (peaceful mode here!)",
+            "moving at 48 speed, zero rush, maximum cozy",
+            "my warm glow is glowing ember rgb(221, 107, 76) [[swatch:rgb(221, 107, 76)]]",
+            "the only thing hotter than me is that old hp pavilion compiling rust 😭",
+            "🔥",
+            "tide crab worries i'll scorch his sand. chill out, crab!",
+            "forget about me for 20 seconds and i'll slowly slither on"
+          ]
+        }
       },
       terminal: {
         title: "fish 4.9.3 — dimasbotyara@archlinux",
@@ -461,7 +745,7 @@ const SITE_DATA = {
       favBadgeGame: "fav roguelike",
       favBadgePong: "pure chaos",
       favBadgeCloud: "my lan drive",
-      favBadgeJump: "level editor",
+      favBadgeJump: "hop-hop",
       desktopClientNote: "+ tauri/rust desktop client",
       siteCardNote: "game showcase page"
     }
