@@ -770,6 +770,7 @@ const SITE_DATA = {
       url: "https://github.com/dimasbotyara/botyaratalk",
       extraUrl: "https://github.com/dimasbotyara/botyaratalk-desktop",
       extraLabelKey: "desktopClientNote",
+      extraFirst: true,
       lang: "JS / Flask",
       accent: "aqua",
       icon: "chat",
