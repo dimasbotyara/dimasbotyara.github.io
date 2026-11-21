@@ -1239,7 +1239,7 @@
       nextAnimAt: 0,
       talkUntil: 0,
       lastClickedAt: 0,
-      nextSpawnAt: Date.now() + 3500
+      nextSpawnAt: Date.now() + randRange(9000, 14000)
     };
 
     function updateGuestHeaderUI() {
@@ -1549,7 +1549,7 @@
         if (guest.x < -72 || guest.x > stageW + 32) {
           guest.state = "absent";
           guest.spec = null;
-          guest.nextSpawnAt = now + randRange(5000, 8500);
+          guest.nextSpawnAt = now + randRange(24000, 44000);
           guestActor.hidden = true;
           updateGuestHeaderUI();
         }

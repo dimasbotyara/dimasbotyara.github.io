@@ -1136,15 +1136,16 @@ code {
 
 .crab-title-group {
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
   flex-wrap: wrap;
   gap: 8px;
 }
 
 .crab-name {
   font-family: var(--font-pixel);
-  font-size: 0.76rem;
-  line-height: 1.35;
+  font-size: 0.74rem;
+  line-height: 1;
+  padding-top: 2px;
   font-weight: 400;
   color: #df9874;
 }
@@ -1156,6 +1157,7 @@ code {
 .crab-source {
   font-family: var(--font-mono);
   font-size: 0.72rem;
+  line-height: 1;
   color: var(--fg4);
 }
 
@@ -1318,11 +1320,6 @@ code {
 
 .wildlife-guest[hidden] {
   display: none;
-}
-
-.crab-actor:hover .crab-svg,
-.wildlife-guest:hover .crab-svg {
-  filter: drop-shadow(0 0 5px rgba(250, 189, 47, 0.45));
 }
 
 .crab-actor:focus-visible,
