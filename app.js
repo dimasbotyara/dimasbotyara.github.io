@@ -142,8 +142,105 @@
     over77: function () {
       playTone(440, 390, 0.085, "triangle", 0.036, 0);
       playTone(330, 270, 0.13, "triangle", 0.034, 0.085);
+    },
+    celebrate: function () {
+      playTone(523.25, 523.25, 0.09, "triangle", 0.034, 0);
+      playTone(659.25, 659.25, 0.09, "triangle", 0.034, 0.07);
+      playTone(783.99, 880, 0.14, "sine", 0.036, 0.14);
     }
   };
+
+  // =========================================================================
+  // PIXEL CONFETTI BURST (triggered by `dimasbotyara` in terminal!)
+  // =========================================================================
+  function launchConfetti() {
+    var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) return;
+
+    var cs = getComputedStyle(document.documentElement);
+    var palette = ["--red", "--orange", "--yellow", "--green", "--aqua", "--blue", "--purple"]
+      .map(function (v) { return cs.getPropertyValue(v).trim(); })
+      .filter(Boolean);
+    if (!palette.length) {
+      palette = ["#fb4934", "#fe8019", "#fabd2f", "#b8bb26", "#8ec07c", "#83a598", "#d3869b"];
+    }
+
+    var canvas = document.createElement("canvas");
+    canvas.setAttribute("aria-hidden", "true");
+    canvas.style.cssText = "position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:9999;";
+    document.body.appendChild(canvas);
+
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = window.innerWidth;
+    var h = window.innerHeight;
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+
+    var ctx = canvas.getContext("2d");
+    if (!ctx) {
+      canvas.remove();
+      return;
+    }
+    ctx.scale(dpr, dpr);
+
+    var count = w < 640 ? 90 : 140;
+    var pieces = [];
+    for (var i = 0; i < count; i++) {
+      // Launch from two cozy cannon points near the bottom-left and bottom-right, plus top shower
+      var fromCannon = i < count * 0.65;
+      var leftSide = i % 2 === 0;
+      var x = fromCannon ? (leftSide ? w * 0.18 : w * 0.82) : Math.random() * w;
+      var y = fromCannon ? h * 0.82 : -12 - Math.random() * 60;
+      var angle = fromCannon
+        ? (leftSide ? -Math.PI * (0.28 + Math.random() * 0.25) : -Math.PI * (0.47 + Math.random() * 0.25))
+        : Math.PI * 0.5 + (Math.random() - 0.5) * 0.5;
+      var speed = fromCannon ? (8 + Math.random() * 10) : (2.2 + Math.random() * 3.5);
+      pieces.push({
+        x: x,
+        y: y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        size: 5 + Math.floor(Math.random() * 6),
+        ratio: Math.random() < 0.5 ? 1 : 1.7,
+        rot: Math.random() * Math.PI * 2,
+        vrot: (Math.random() - 0.5) * 0.24,
+        color: palette[Math.floor(Math.random() * palette.length)],
+        life: 0,
+        maxLife: 115 + Math.floor(Math.random() * 55)
+      });
+    }
+
+    function step() {
+      ctx.clearRect(0, 0, w, h);
+      var alive = 0;
+      for (var i = 0; i < pieces.length; i++) {
+        var p = pieces[i];
+        p.life += 1;
+        if (p.life > p.maxLife || p.y > h + 30) continue;
+        alive += 1;
+        p.vy += 0.22;
+        p.vx *= 0.985;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rot += p.vrot;
+
+        var alpha = p.life > p.maxLife - 28 ? Math.max(0, (p.maxLife - p.life) / 28) : 1;
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.size / 2, -(p.size * p.ratio) / 2, p.size, p.size * p.ratio);
+        ctx.restore();
+      }
+      if (alive > 0) {
+        requestAnimationFrame(step);
+      } else {
+        canvas.remove();
+      }
+    }
+    requestAnimationFrame(step);
+  }
 
   function setSound(enabled, persist, playFeedback) {
     state.sound = !!enabled;
@@ -379,6 +476,13 @@
         : "";
       var tagsHtml = item.tags.map(function (tg) { return '<span class="tag">' + escapeHtml(tg) + "</span>"; }).join("");
 
+      var repoLink =
+        '<a class="card-link" href="' + item.url + '" target="_blank" rel="noopener noreferrer">' +
+          '<span>' + escapeHtml(t("sections.openRepo")) + "</span>" +
+          ICONS.ext +
+        "</a>";
+      var linksHtml = item.extraFirst && extra ? (extra + repoLink) : (repoLink + extra);
+
       return (
         '<article class="fav-card accent-' + item.accent + '">' +
           '<div class="fav-top">' +
@@ -394,11 +498,7 @@
           '<p class="fav-desc">' + formatText(item.desc[state.lang]) + "</p>" +
           '<div class="tag-row">' + tagsHtml + "</div>" +
           '<div class="fav-links">' +
-            '<a class="card-link" href="' + item.url + '" target="_blank" rel="noopener noreferrer">' +
-              '<span>' + escapeHtml(t("sections.openRepo")) + "</span>" +
-              ICONS.ext +
-            "</a>" +
-            extra +
+            linksHtml +
           "</div>" +
         "</article>"
       );
@@ -677,6 +777,13 @@
     if (lower === "fastfetch" || lower === "neofetch") {
       return buildFastfetchHtml();
     }
+    if (lower === "dimasbotyara") {
+      launchConfetti();
+      SFX.celebrate();
+      return isRu
+        ? '<span class="t-warn">🎉 dimasbotyara!!</span> <span class="t-ok">конфетти пошло!! 🐸✨</span>'
+        : '<span class="t-warn">🎉 dimasbotyara!!</span> <span class="t-ok">confetti deployed!! 🐸✨</span>';
+    }
     if (lower === "whoami") {
       return isRu
         ? '<span class="t-aqua">dimasbotyara</span> — пилю игры на pygame, self-hosted штуки для локалки и утилиты под arch/cachyos.<br/><span class="t-dim">local-first, self-hosted и фанат gruvbox.</span>'
@@ -911,9 +1018,9 @@
     if (lower === "help") {
       return isRu
         ? '<span class="t-warn">команды:</span><br/>' +
-          '<span class="t-aqua">touch grass</span> · <span class="t-aqua">sudo touch grass</span> · <span class="t-aqua">fastfetch</span> · <span class="t-aqua">htop</span> · <span class="t-aqua">battery</span> · <span class="t-aqua">uptime</span> · <span class="t-aqua">uname</span> · <span class="t-aqua">date</span> · <span class="t-aqua">pwd</span> · <span class="t-aqua">ls</span> · <span class="t-aqua">cat readme</span> · <span class="t-aqua">whoami</span> · <span class="t-aqua">contacts</span> · <span class="t-aqua">crab</span> · <span class="t-aqua">wildlife</span> · <span class="t-aqua">guest</span> · <span class="t-aqua">frog</span> · <span class="t-aqua">cowsay</span> · <span class="t-aqua">pacman -Syu</span> · <span class="t-aqua">matrix</span> · <span class="t-aqua">fortune</span> · <span class="t-aqua">ping</span> · <span class="t-aqua">echo</span> · <span class="t-aqua">random</span> · <span class="t-aqua">theme</span> · <span class="t-aqua">theme list</span> · <span class="t-aqua">sound</span> · <span class="t-aqua">lang</span> · <span class="t-aqua">clear</span>'
+          '<span class="t-aqua">dimasbotyara</span> · <span class="t-aqua">touch grass</span> · <span class="t-aqua">sudo touch grass</span> · <span class="t-aqua">fastfetch</span> · <span class="t-aqua">htop</span> · <span class="t-aqua">battery</span> · <span class="t-aqua">uptime</span> · <span class="t-aqua">uname</span> · <span class="t-aqua">date</span> · <span class="t-aqua">pwd</span> · <span class="t-aqua">ls</span> · <span class="t-aqua">cat readme</span> · <span class="t-aqua">whoami</span> · <span class="t-aqua">contacts</span> · <span class="t-aqua">crab</span> · <span class="t-aqua">wildlife</span> · <span class="t-aqua">guest</span> · <span class="t-aqua">frog</span> · <span class="t-aqua">cowsay</span> · <span class="t-aqua">pacman -Syu</span> · <span class="t-aqua">matrix</span> · <span class="t-aqua">fortune</span> · <span class="t-aqua">ping</span> · <span class="t-aqua">echo</span> · <span class="t-aqua">random</span> · <span class="t-aqua">theme</span> · <span class="t-aqua">theme list</span> · <span class="t-aqua">sound</span> · <span class="t-aqua">lang</span> · <span class="t-aqua">clear</span>'
         : '<span class="t-warn">commands:</span><br/>' +
-          '<span class="t-aqua">touch grass</span> · <span class="t-aqua">sudo touch grass</span> · <span class="t-aqua">fastfetch</span> · <span class="t-aqua">htop</span> · <span class="t-aqua">battery</span> · <span class="t-aqua">uptime</span> · <span class="t-aqua">uname</span> · <span class="t-aqua">date</span> · <span class="t-aqua">pwd</span> · <span class="t-aqua">ls</span> · <span class="t-aqua">cat readme</span> · <span class="t-aqua">whoami</span> · <span class="t-aqua">contacts</span> · <span class="t-aqua">crab</span> · <span class="t-aqua">wildlife</span> · <span class="t-aqua">guest</span> · <span class="t-aqua">frog</span> · <span class="t-aqua">cowsay</span> · <span class="t-aqua">pacman -Syu</span> · <span class="t-aqua">matrix</span> · <span class="t-aqua">fortune</span> · <span class="t-aqua">ping</span> · <span class="t-aqua">echo</span> · <span class="t-aqua">random</span> · <span class="t-aqua">theme</span> · <span class="t-aqua">theme list</span> · <span class="t-aqua">sound</span> · <span class="t-aqua">lang</span> · <span class="t-aqua">clear</span>';
+          '<span class="t-aqua">dimasbotyara</span> · <span class="t-aqua">touch grass</span> · <span class="t-aqua">sudo touch grass</span> · <span class="t-aqua">fastfetch</span> · <span class="t-aqua">htop</span> · <span class="t-aqua">battery</span> · <span class="t-aqua">uptime</span> · <span class="t-aqua">uname</span> · <span class="t-aqua">date</span> · <span class="t-aqua">pwd</span> · <span class="t-aqua">ls</span> · <span class="t-aqua">cat readme</span> · <span class="t-aqua">whoami</span> · <span class="t-aqua">contacts</span> · <span class="t-aqua">crab</span> · <span class="t-aqua">wildlife</span> · <span class="t-aqua">guest</span> · <span class="t-aqua">frog</span> · <span class="t-aqua">cowsay</span> · <span class="t-aqua">pacman -Syu</span> · <span class="t-aqua">matrix</span> · <span class="t-aqua">fortune</span> · <span class="t-aqua">ping</span> · <span class="t-aqua">echo</span> · <span class="t-aqua">random</span> · <span class="t-aqua">theme</span> · <span class="t-aqua">theme list</span> · <span class="t-aqua">sound</span> · <span class="t-aqua">lang</span> · <span class="t-aqua">clear</span>';
     }
     return isRu
       ? '<span class="t-err">fish: неизвестная команда: ' + escapeHtml(cmd) + '</span><br/><span class="t-dim">напиши help чтобы глянуть, что я умею</span>'
@@ -1876,6 +1983,15 @@
     initCalculator();
     initContactCopy();
     initTerminal();
+
+    // Brand logo click -> always scroll cleanly to the very top (y = 0)
+    var brandLink = document.querySelector(".brand");
+    if (brandLink) {
+      brandLink.addEventListener("click", function (e) {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    }
 
     // Visible Palette Picker dropdown
     var themePicker = document.getElementById("themePicker");
