@@ -80,7 +80,7 @@ const SITE_DATA = {
           "i use arch btw 🦀",
           "👀",
           "я бы убежал на берег, но тут в gruvbox слишком уютно",
-          "тыкнешь ещё раз — сделаю замах 0.32 сек...",
+          "тыкнешь ещё раз — сделаю замах за 0.32 сек...",
           "🌊",
           "мои глаза — rgb(255, 237, 121) [[swatch:rgb(255, 237, 121)]], светятся даже в темноте!",
           "сижу тут, чиллю, никого не трогаю (пока)",
@@ -119,9 +119,10 @@ const SITE_DATA = {
         chips: [
           { cmd: "touch grass", label: "touch grass" },
           { cmd: "fastfetch", label: "fastfetch" },
-          { cmd: "whoami", label: "whoami" },
+          { cmd: "htop", label: "htop" },
           { cmd: "contacts", label: "contacts" },
-          { cmd: "crab", label: "🦀 crab" }
+          { cmd: "crab", label: "🦀 crab" },
+          { cmd: "help", label: "help" }
         ]
       },
       sections: {
@@ -240,6 +241,9 @@ const SITE_DATA = {
       favBadgeDaily: "юзаю каждый день",
       favBadgeBack: "постоянно допиливаю",
       favBadgeGame: "любимый рогалик",
+      favBadgePong: "чистый хаос",
+      favBadgeCloud: "мой lan-диск",
+      favBadgeJump: "редактор уровней",
       desktopClientNote: "+ десктоп-клиент на tauri/rust",
       siteCardNote: "визитка игры"
     },
@@ -333,9 +337,10 @@ const SITE_DATA = {
         chips: [
           { cmd: "touch grass", label: "touch grass" },
           { cmd: "fastfetch", label: "fastfetch" },
-          { cmd: "whoami", label: "whoami" },
+          { cmd: "htop", label: "htop" },
           { cmd: "contacts", label: "contacts" },
-          { cmd: "crab", label: "🦀 crab" }
+          { cmd: "crab", label: "🦀 crab" },
+          { cmd: "help", label: "help" }
         ]
       },
       sections: {
@@ -454,6 +459,9 @@ const SITE_DATA = {
       favBadgeDaily: "daily driver",
       favBadgeBack: "keep coming back to",
       favBadgeGame: "fav roguelike",
+      favBadgePong: "pure chaos",
+      favBadgeCloud: "my lan drive",
+      favBadgeJump: "level editor",
       desktopClientNote: "+ tauri/rust desktop client",
       siteCardNote: "game showcase page"
     }
@@ -509,6 +517,7 @@ const SITE_DATA = {
       lang: "Python",
       accent: "orange",
       icon: "pong",
+      badgeKey: "favBadgePong",
       tags: ["28 power-ups", "LAN", "pygame", "chaos"],
       desc: {
         ru: "классический понг на стероидах: 28 паверапов, 3 сложности бота, локальный мультиплеер с автопоиском, частицы, тряска экрана и ui на nerd font. чистый pygame и хаос.",
@@ -521,6 +530,7 @@ const SITE_DATA = {
       lang: "JS / Flask",
       accent: "blue",
       icon: "cloud",
+      badgeKey: "favBadgeCloud",
       tags: ["LAN", "live viewer", "8 themes", "self-hosted"],
       desc: {
         ru: "локальный файловый сервер — как `python -m http.server`, только на стероидах и реально приятный. кинул файл в папку — все сразу видят. встроенный просмотр фото, видео, аудио, pdf и кода.",
@@ -533,6 +543,7 @@ const SITE_DATA = {
       lang: "Python",
       accent: "green",
       icon: "jump",
+      badgeKey: "favBadgeJump",
       tags: ["platformer", "level editor", "quests", "pygame-ce"],
       desc: {
         ru: "платформер в духе doodle jump на pygame-ce: бесконечные режимы от лавы до зеркального мира, скины реально меняющие геймплей, ежедневные квесты, сюжетка и встроенный редактор уровней.",

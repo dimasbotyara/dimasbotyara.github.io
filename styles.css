@@ -1,6 +1,6 @@
 /* ==========================================================================
    dimasbotyara.github.io — Gruvbox Dark (default) & Gruvbox Light
-   5-font system: Unbounded · Pixelify Sans · JetBrains Mono · Rubik · Caveat
+   5-font system: Unbounded · Silkscreen / Press Start 2P · JetBrains Mono · Rubik · Caveat
    ========================================================================== */
 
 :root,
@@ -87,7 +87,7 @@
 /* Font roles */
 :root {
   --font-display: "Unbounded", system-ui, sans-serif;
-  --font-pixel: "Silkscreen", "Pixelify Sans", "JetBrains Mono", monospace;
+  --font-pixel: "Silkscreen", "Press Start 2P", "JetBrains Mono", monospace;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --font-body: "Rubik", system-ui, -apple-system, sans-serif;
   --font-hand: "Caveat", cursive;
@@ -776,6 +776,12 @@ code {
   word-break: break-word;
 }
 
+.term-pending {
+  display: inline-block;
+  color: var(--yellow);
+  animation: blink 0.5s steps(1) infinite;
+}
+
 .fastfetch-grid {
   display: flex;
   gap: 14px;
@@ -908,8 +914,9 @@ code {
 
 .crab-name {
   font-family: var(--font-pixel);
-  font-size: 0.96rem;
-  font-weight: 700;
+  font-size: 0.76rem;
+  line-height: 1.35;
+  font-weight: 400;
   color: #df9874;
 }
 
@@ -1148,7 +1155,8 @@ code {
 
 .fav-badge {
   font-family: var(--font-pixel);
-  font-size: 0.7rem;
+  font-size: 0.6rem;
+  line-height: 1.45;
   padding: 3px 8px;
   border-radius: 4px;
   background: var(--bg1);
@@ -1961,7 +1969,8 @@ code {
 .stack-group-title {
   margin: 0 0 14px;
   font-family: var(--font-pixel);
-  font-size: 0.96rem;
+  font-size: 0.82rem;
+  line-height: 1.4;
   color: var(--card-accent, var(--yellow));
   display: flex;
   align-items: center;

@@ -391,6 +391,15 @@
   // INTERACTIVE FISH TERMINAL
   // =========================================================================
   var termOut = null;
+  var termBootTime = Date.now();
+  var pendingTermTimers = [];
+
+  function clearPendingTermTimers() {
+    for (var i = 0; i < pendingTermTimers.length; i++) {
+      clearTimeout(pendingTermTimers[i]);
+    }
+    pendingTermTimers = [];
+  }
 
   function renderTermChips() {
     var wrap = document.getElementById("termChips");
@@ -407,8 +416,8 @@
     });
   }
 
-  function appendTermEntry(host, cmd, outputHtml) {
-    if (!termOut) return;
+  function createTermEntry(host, cmd, outputHtml) {
+    if (!termOut) return null;
     var div = document.createElement("div");
     div.className = "term-entry";
     div.innerHTML =
@@ -418,9 +427,10 @@
         '<span class="t-prompt">❯</span>' +
         '<span class="t-cmd">' + escapeHtml(cmd) + "</span>" +
       "</div>" +
-      (outputHtml ? '<div class="term-res">' + outputHtml + "</div>" : "");
+      '<div class="term-res">' + (outputHtml || "") + "</div>";
     termOut.appendChild(div);
     termOut.scrollTop = termOut.scrollHeight;
+    return div.querySelector(".term-res");
   }
 
   function buildFastfetchHtml() {
@@ -441,88 +451,265 @@
     );
   }
 
-  function runCommand(rawCmd, hostOverride) {
-    var cmd = String(rawCmd || "").trim();
-    if (!cmd) return;
+  function formatFrogSay(msg) {
+    var safe = escapeHtml(msg);
+    return (
+      '<pre class="term-pre t-ok">' +
+      "   @..@     " + safe + "\n" +
+      "  (----)\n" +
+      " ( >__< )\n" +
+      " ^^ ~~ ^^" +
+      "</pre>"
+    );
+  }
+
+  function formatCowSay(msg) {
+    var clean = String(msg || "moo");
+    var border = "-".repeat(Math.min(34, clean.length + 2));
+    return (
+      '<pre class="term-pre t-warn">' +
+      " " + border + "\n" +
+      "< " + escapeHtml(clean) + " >\n" +
+      " " + border + "\n" +
+      "        \\   ^__^\n" +
+      "         \\  (oo)\\_______\n" +
+      "            (__)\\       )\\/\\\n" +
+      "                ||----w |\n" +
+      "                ||     ||" +
+      "</pre>"
+    );
+  }
+
+  function resolveCommand(cmd) {
     var lower = cmd.toLowerCase();
-    var host = hostOverride || "archlinux";
     var isRu = state.lang === "ru";
 
-    if (lower === "clear" || lower === "cls") {
-      if (termOut) termOut.innerHTML = "";
-      return;
-    }
-
-    var out = "";
-
     if (lower === "touch grass") {
-      out = '<span class="t-err">touch: cannot touch \'grass\': Permission denied</span>';
-    } else if (lower === "sudo touch grass") {
-      out = isRu
+      return '<span class="t-err">touch: cannot touch \'grass\': Permission denied</span>';
+    }
+    if (lower === "sudo touch grass") {
+      return isRu
         ? '<span class="t-warn">[sudo] пароль для dimasbotyara: ********</span><br/><span class="t-err">dimasbotyara is not in the grassers file. this incident will be reported 😭</span>'
         : '<span class="t-warn">[sudo] password for dimasbotyara: ********</span><br/><span class="t-err">dimasbotyara is not in the grassers file. this incident will be reported 😭</span>';
-    } else if (lower === "fastfetch" || lower === "neofetch") {
-      out = buildFastfetchHtml();
-    } else if (lower === "whoami") {
-      out = isRu
+    }
+    if (lower === "fastfetch" || lower === "neofetch") {
+      return buildFastfetchHtml();
+    }
+    if (lower === "whoami") {
+      return isRu
         ? '<span class="t-aqua">dimasbotyara</span> — пилю игры на pygame, self-hosted штуки для локалки и утилиты под arch/cachyos.<br/><span class="t-dim">local-first, self-hosted и фанат gruvbox.</span>'
         : '<span class="t-aqua">dimasbotyara</span> — building pygame games, local-first LAN apps & linux tools on arch/cachyos.<br/><span class="t-dim">local-first, self-hosted & gruvbox enjoyer.</span>';
-    } else if (lower === "contacts" || lower === "contact" || lower === "tg" || lower === "telegram" || lower === "discord") {
-      out =
+    }
+    if (lower === "contacts" || lower === "contact" || lower === "tg" || lower === "telegram" || lower === "discord") {
+      return (
         '<span class="t-aqua">github:</span>   <a class="t-warn" href="https://github.com/dimasbotyara" target="_blank" rel="noopener noreferrer">github.com/dimasbotyara</a><br/>' +
         '<span class="t-aqua">telegram:</span> <span class="t-warn">@dimasbotyara</span><br/>' +
-        '<span class="t-aqua">discord:</span>  <span class="t-purple">@dimas888</span>';
-    } else if (lower === "crab" || lower === "tide_crab" || lower === "краб") {
+        '<span class="t-aqua">discord:</span>  <span class="t-purple">@dimas888</span>'
+      );
+    }
+    if (lower === "crab" || lower === "tide_crab" || lower === "краб") {
       if (typeof boopCrab === "function") boopCrab();
-      out =
+      return (
         '<div style="display:flex;align-items:center;gap:10px;margin-top:4px">' +
           '<svg viewBox="0 0 11 9" shape-rendering="crispEdges" width="44" height="36">' + buildCrabRects(0, false) + "</svg>" +
           '<div><span class="t-orange">' + escapeHtml(t("crab.name")) + '</span> <span class="t-dim">(hp: 50, coast)</span><br/>' +
           '<span class="t-dim">' + (isRu ? "клац-клац! живой прямо под терминалом ↓" : "snip-snip! scuttling right below this terminal ↓") + "</span></div>" +
-        "</div>";
-    } else if (lower === "frog" || lower === "frogsay") {
-      out =
-        '<pre class="term-pre t-ok">' +
-        "   @..@     " + (isRu ? "квак! поставь gruvbox и не трогай облака" : "ribbit! use gruvbox & ditch the cloud") + "\n" +
-        "  (----)\n" +
-        " ( >__< )\n" +
-        " ^^ ~~ ^^" +
-        "</pre>";
-    } else if (lower === "ls" || lower === "ls -la") {
-      out =
-        '<span class="t-aqua">botyaranewtab/</span>  <span class="t-aqua">botyaratalk/</span>  <span class="t-orange">botyarapong/</span>  <span class="t-aqua">botyaracloud/</span>  <span class="t-ok">botyarajump/</span><br/>' +
-        '<span class="t-purple">alchemy-matcher/</span>  <span class="t-err">pygame-slide-survivors/</span>  <span class="t-warn">b-lang/</span>  <span class="t-dim">... (+41 more)</span>';
-    } else if (lower === "theme") {
+        "</div>"
+      );
+    }
+    if (lower === "frog" || lower === "frogsay") {
+      return formatFrogSay(isRu ? "квак! поставь gruvbox и не трогай облака" : "ribbit! use gruvbox & ditch the cloud");
+    }
+    if (lower.indexOf("frogsay ") === 0) {
+      return formatFrogSay(cmd.slice(8).trim() || "квак!");
+    }
+    if (lower === "cowsay" || lower.indexOf("cowsay ") === 0) {
+      var cowMsg = cmd.slice(6).trim() || (isRu ? "муу... поставь arch linux" : "moo... install arch linux");
+      return formatCowSay(cowMsg);
+    }
+    if (lower === "ls" || lower === "ls -la" || lower === "ls -l") {
+      return (
+        '<span class="t-aqua">botyaranewtab/</span>  <span class="t-aqua">botyaratalk/</span>  <span class="t-err">pygame-slide-survivors/</span>  <span class="t-orange">botyarapong/</span><br/>' +
+        '<span class="t-aqua">botyaracloud/</span>   <span class="t-ok">botyarajump/</span>  <span class="t-purple">alchemy-matcher/</span>         <span class="t-warn">b-lang/</span><br/>' +
+        '<span class="t-dim">README.md  ... (+41 repos — see #shelf)</span>'
+      );
+    }
+    if (lower === "pwd") {
+      return '<span class="t-aqua">/home/dimasbotyara</span>';
+    }
+    if (lower === "uname" || lower === "uname -a") {
+      return '<span class="t-dim">Linux archlinux 5.15.209-1-lts515 #1 SMP PREEMPT x86_64 GNU/Linux</span>';
+    }
+    if (lower === "date") {
+      return '<span class="t-aqua">' + escapeHtml(new Date().toLocaleString(isRu ? "ru-RU" : "en-US")) + "</span>";
+    }
+    if (lower === "uptime") {
+      var sec = Math.max(1, Math.floor((Date.now() - termBootTime) / 1000));
+      var mins = Math.floor(sec / 60);
+      var rem = sec % 60;
+      return isRu
+        ? '<span class="t-ok">up ' + mins + " мин " + rem + ' сек</span> <span class="t-dim">| core 2 duo t5850: всё ещё жив, load avg: 0.42, 0.37, 0.28</span>'
+        : '<span class="t-ok">up ' + mins + " min " + rem + ' sec</span> <span class="t-dim">| core 2 duo t5850: still alive, load avg: 0.42, 0.37, 0.28</span>';
+    }
+    if (lower === "battery" || lower === "acpi") {
+      return isRu
+        ? '<span class="t-warn">Battery 0:</span> <span class="t-err">0%</span> <span class="t-dim">[AC Connected, Unknown] — живёт исключительно от розетки 😭</span>'
+        : '<span class="t-warn">Battery 0:</span> <span class="t-err">0%</span> <span class="t-dim">[AC Connected, Unknown] — strictly wall-powered since 2008 😭</span>';
+    }
+    if (lower === "htop" || lower === "top") {
+      return (
+        '<pre class="term-pre">' +
+        '<span class="t-aqua">CPU0</span> [<span class="t-ok">||||||||</span>          41%]  <span class="t-dim">Core2 Duo T5850</span>\n' +
+        '<span class="t-aqua">CPU1</span> [<span class="t-warn">|||||||||||</span>       58%]  <span class="t-dim">@ 2.17 GHz</span>\n' +
+        '<span class="t-aqua">MEM </span> [<span class="t-ok">|||</span>               561M/3.83G]\n' +
+        '<span class="t-dim">PID  USER          COMMAND</span>\n' +
+        ' 101 dimasbotyara  <span class="t-ok">fish 4.9.3</span>\n' +
+        ' 204 dimasbotyara  <span class="t-orange">tide_crab --biome=coast</span>\n' +
+        ' 318 dimasbotyara  <span class="t-aqua">python3 botyaranewtab.py</span>\n' +
+        ' 409 dimasbotyara  <span class="t-purple">pygame-slide-survivors</span>' +
+        "</pre>"
+      );
+    }
+    if (lower === "cat readme" || lower === "cat readme.md") {
+      return isRu
+        ? '<span class="t-warn">## 🐸 dimasbotyara | i use arch btw</span><br/>' +
+          'пилю игры на чистом pygame, self-hosted штуки для локалки и cli-утилиты.<br/>' +
+          '<span class="t-dim">код пишу с ии, но читаю каждый diff (так я оправдываю своё неумение писать код 😅)</span>'
+        : '<span class="t-warn">## 🐸 dimasbotyara | i use arch btw</span><br/>' +
+          'building pure pygame games, local-first LAN apps & linux cli tools.<br/>' +
+          '<span class="t-dim">i write code with ai, reading every diff (that\'s how i justify not knowing how to code 😅)</span>';
+    }
+    if (lower === "pacman -syu" || lower === "sudo pacman -syu" || lower === "pacman") {
+      return (
+        '<pre class="term-pre">' +
+        '<span class="t-aqua">::</span> Synchronizing package databases...\n' +
+        ' core is up to date\n' +
+        ' extra is up to date\n' +
+        ' multilib is up to date\n' +
+        '<span class="t-aqua">::</span> Starting full system upgrade...\n' +
+        '<span class="t-ok"> there is nothing to do</span> <span class="t-dim">(btw i use arch)</span>' +
+        "</pre>"
+      );
+    }
+    if (lower === "matrix") {
+      var chars = "01ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿ#$%@*";
+      var lines = [];
+      for (var r = 0; r < 4; r++) {
+        var row = "";
+        for (var c = 0; c < 34; c++) {
+          row += Math.random() < 0.35 ? " " : chars[Math.floor(Math.random() * chars.length)];
+        }
+        lines.push(row);
+      }
+      return '<pre class="term-pre t-ok">' + escapeHtml(lines.join("\n")) + '</pre><span class="t-dim">→ github.com/dimasbotyara/cli-anims</span>';
+    }
+    if (lower === "fortune" || lower === "quote") {
+      var pool = t("crab.quotes") || ["🦀"];
+      var textOnly = pool.filter(function (q) { return q.length > 6; });
+      var chosen = textOnly[Math.floor(Math.random() * textOnly.length)] || pool[0];
+      var clean = chosen.replace(/\[\[swatch:[^\]]+\]\]/g, "");
+      return '<span class="t-purple">✦</span> <span class="t-warn">' + escapeHtml(clean) + "</span>";
+    }
+    if (lower === "ping" || lower.indexOf("ping ") === 0) {
+      var target = cmd.slice(4).trim() || "grass";
+      if (target.toLowerCase() === "grass") {
+        return '<span class="t-err">ping: grass: Temporary failure in name resolution</span>';
+      }
+      return (
+        '<span class="t-dim">PING ' + escapeHtml(target) + ' (192.168.1.46): 56 data bytes</span><br/>' +
+        '<span class="t-ok">64 bytes from ' + escapeHtml(target) + ": icmp_seq=1 ttl=64 time=0.42 ms</span>"
+      );
+    }
+    if (lower === "echo" || lower.indexOf("echo ") === 0) {
+      var arg = cmd.slice(4).trim();
+      if (arg === "$USER") return '<span class="t-aqua">dimasbotyara</span>';
+      if (arg === "$SHELL") return '<span class="t-aqua">/usr/bin/fish</span>';
+      if (arg === "$THEME") return '<span class="t-warn">gruvbox-' + state.theme + "</span>";
+      if (arg === "$LANG") return '<span class="t-aqua">' + (state.lang === "ru" ? "ru_RU.UTF-8" : "en_US.UTF-8") + "</span>";
+      return escapeHtml(arg || "");
+    }
+    if (lower === "vim" || lower === "nvim" || lower === "vi") {
+      return isRu
+        ? '<span class="t-warn">ты открыл vim.</span> <span class="t-dim">подсказка: чтобы выйти, набери :q! (ладно, я сам закрою, живи)</span>'
+        : '<span class="t-warn">you opened vim.</span> <span class="t-dim">hint: type :q! to escape (jk, closing it for you)</span>';
+    }
+    if (lower === "nano") {
+      return isRu
+        ? '<span class="t-ok">уважаемо.</span> <span class="t-dim">^X чтобы выйти, но здесь просто визитка :)</span>'
+        : '<span class="t-ok">respectable choice.</span> <span class="t-dim">^X to exit, though this is just a webpage :)</span>';
+    }
+    if (lower === "exit" || lower === "logout") {
+      return isRu
+        ? '<span class="t-purple">нельзя просто так выйти с моей визитки 🐸</span>'
+        : '<span class="t-purple">you can\'t just exit my personal page 🐸</span>';
+    }
+    if (lower === "theme") {
       setTheme(state.theme === "dark" ? "light" : "dark", true);
-      out = '<span class="t-ok">switched to gruvbox ' + state.theme + "</span>";
-    } else if (lower === "lang" || lower === "ru" || lower === "en") {
+      return '<span class="t-ok">switched to gruvbox ' + state.theme + "</span>";
+    }
+    if (lower === "lang" || lower === "ru" || lower === "en") {
       var nextLang = (lower === "ru" || lower === "en") ? lower : (state.lang === "ru" ? "en" : "ru");
       setLang(nextLang, true);
-      out = '<span class="t-ok">locale -> ' + nextLang + "</span>";
-    } else if (lower === "random") {
+      return '<span class="t-ok">locale -> ' + nextLang + "</span>";
+    }
+    if (lower === "random") {
       var pick = SITE_DATA.shelf[Math.floor(Math.random() * SITE_DATA.shelf.length)];
-      out = '<span class="t-purple">🎲 ' + escapeHtml(pick.name) + '</span> — ' + escapeHtml(pick.desc[state.lang]);
-    } else if (lower === "arch" || lower === "cachyos") {
-      out = isRu
+      return '<span class="t-purple">🎲 ' + escapeHtml(pick.name) + '</span> — ' + escapeHtml(pick.desc[state.lang]);
+    }
+    if (lower === "arch" || lower === "cachyos") {
+      return isRu
         ? '<span class="t-aqua">i use arch btw</span> <span class="t-dim">(и cachyos на основном пк!)</span>'
         : '<span class="t-aqua">i use arch btw</span> <span class="t-dim">(and cachyos on my main rig!)</span>';
-    } else if (lower.indexOf("rm -rf") === 0) {
-      out = isRu
+    }
+    if (lower.indexOf("rm -rf") === 0) {
+      return isRu
         ? '<span class="t-err">эй, руки прочь от моего core 2 duo!! он и так держится на честном слове 😭</span>'
         : '<span class="t-err">hey, hands off my core 2 duo!! it barely survived 2008 as is 😭</span>';
-    } else if (lower === "help") {
-      out = isRu
-        ? '<span class="t-warn">доступные команды:</span><br/>' +
-          '<span class="t-aqua">touch grass</span> · <span class="t-aqua">sudo touch grass</span> · <span class="t-aqua">fastfetch</span> · <span class="t-aqua">whoami</span> · <span class="t-aqua">contacts</span> · <span class="t-aqua">crab</span> · <span class="t-aqua">frog</span> · <span class="t-aqua">ls</span> · <span class="t-aqua">random</span> · <span class="t-aqua">theme</span> · <span class="t-aqua">lang</span> · <span class="t-aqua">clear</span>'
-        : '<span class="t-warn">available commands:</span><br/>' +
-          '<span class="t-aqua">touch grass</span> · <span class="t-aqua">sudo touch grass</span> · <span class="t-aqua">fastfetch</span> · <span class="t-aqua">whoami</span> · <span class="t-aqua">contacts</span> · <span class="t-aqua">crab</span> · <span class="t-aqua">frog</span> · <span class="t-aqua">ls</span> · <span class="t-aqua">random</span> · <span class="t-aqua">theme</span> · <span class="t-aqua">lang</span> · <span class="t-aqua">clear</span>';
-    } else {
-      out = isRu
-        ? '<span class="t-err">fish: неизвестная команда: ' + escapeHtml(cmd) + '</span><br/><span class="t-dim">напиши help чтобы глянуть, что я умею</span>'
-        : '<span class="t-err">fish: unknown command: ' + escapeHtml(cmd) + '</span><br/><span class="t-dim">type help to see what works here</span>';
+    }
+    if (lower.indexOf("sudo ") === 0) {
+      return isRu
+        ? '<span class="t-err">[sudo] отказано в доступе. здесь рулит только димас ботяра (и краб) 🦀</span>'
+        : '<span class="t-err">[sudo] permission denied. only dimasbotyara (and the crab) has root here 🦀</span>';
+    }
+    if (lower === "help") {
+      return isRu
+        ? '<span class="t-warn">команды:</span><br/>' +
+          '<span class="t-aqua">touch grass</span> · <span class="t-aqua">sudo touch grass</span> · <span class="t-aqua">fastfetch</span> · <span class="t-aqua">htop</span> · <span class="t-aqua">battery</span> · <span class="t-aqua">uptime</span> · <span class="t-aqua">uname</span> · <span class="t-aqua">date</span> · <span class="t-aqua">pwd</span> · <span class="t-aqua">ls</span> · <span class="t-aqua">cat readme</span> · <span class="t-aqua">whoami</span> · <span class="t-aqua">contacts</span> · <span class="t-aqua">crab</span> · <span class="t-aqua">frog</span> · <span class="t-aqua">cowsay</span> · <span class="t-aqua">pacman -Syu</span> · <span class="t-aqua">matrix</span> · <span class="t-aqua">fortune</span> · <span class="t-aqua">ping</span> · <span class="t-aqua">echo</span> · <span class="t-aqua">random</span> · <span class="t-aqua">theme</span> · <span class="t-aqua">lang</span> · <span class="t-aqua">clear</span>'
+        : '<span class="t-warn">commands:</span><br/>' +
+          '<span class="t-aqua">touch grass</span> · <span class="t-aqua">sudo touch grass</span> · <span class="t-aqua">fastfetch</span> · <span class="t-aqua">htop</span> · <span class="t-aqua">battery</span> · <span class="t-aqua">uptime</span> · <span class="t-aqua">uname</span> · <span class="t-aqua">date</span> · <span class="t-aqua">pwd</span> · <span class="t-aqua">ls</span> · <span class="t-aqua">cat readme</span> · <span class="t-aqua">whoami</span> · <span class="t-aqua">contacts</span> · <span class="t-aqua">crab</span> · <span class="t-aqua">frog</span> · <span class="t-aqua">cowsay</span> · <span class="t-aqua">pacman -Syu</span> · <span class="t-aqua">matrix</span> · <span class="t-aqua">fortune</span> · <span class="t-aqua">ping</span> · <span class="t-aqua">echo</span> · <span class="t-aqua">random</span> · <span class="t-aqua">theme</span> · <span class="t-aqua">lang</span> · <span class="t-aqua">clear</span>';
+    }
+    return isRu
+      ? '<span class="t-err">fish: неизвестная команда: ' + escapeHtml(cmd) + '</span><br/><span class="t-dim">напиши help чтобы глянуть, что я умею</span>'
+      : '<span class="t-err">fish: unknown command: ' + escapeHtml(cmd) + '</span><br/><span class="t-dim">type help to see what works here</span>';
+  }
+
+  function runCommand(rawCmd, hostOverride, immediate) {
+    var cmd = String(rawCmd || "").trim();
+    if (!cmd) return;
+    var lower = cmd.toLowerCase();
+    var host = hostOverride || "archlinux";
+
+    if (lower === "clear" || lower === "cls") {
+      clearPendingTermTimers();
+      if (termOut) termOut.innerHTML = "";
+      return;
     }
 
-    appendTermEntry(host, cmd, out);
+    if (immediate) {
+      createTermEntry(host, cmd, resolveCommand(cmd));
+      return;
+    }
+
+    // Subtle 0.25s–0.50s vintage laptop execution delay
+    var resNode = createTermEntry(host, cmd, '<span class="term-pending">█</span>');
+    var delay = 250 + Math.random() * 250;
+    var timerId = setTimeout(function () {
+      if (resNode && resNode.isConnected) {
+        resNode.innerHTML = resolveCommand(cmd);
+        if (termOut) termOut.scrollTop = termOut.scrollHeight;
+      }
+    }, delay);
+    pendingTermTimers.push(timerId);
   }
 
   function initTerminal() {
@@ -531,9 +718,9 @@
     var input = document.getElementById("termInput");
     var clearBtn = document.getElementById("termClear");
 
-    // Seed with authentic README moment: cachyos touch grass + archlinux fastfetch preview
-    runCommand("touch grass", "cachyos");
-    runCommand("fastfetch", "archlinux");
+    // Seed immediately on load: cachyos touch grass + archlinux fastfetch
+    runCommand("touch grass", "cachyos", true);
+    runCommand("fastfetch", "archlinux", true);
 
     if (form && input) {
       form.addEventListener("submit", function (e) {
@@ -568,6 +755,7 @@
 
     if (clearBtn) {
       clearBtn.addEventListener("click", function () {
+        clearPendingTermTimers();
         if (termOut) termOut.innerHTML = "";
         if (input) input.focus();
       });
@@ -735,8 +923,7 @@
       activeQuoteIdx = idx;
 
       var line = quotes[idx];
-      var plainLen = line.replace(/\[\[swatch:[^\]]+\]\]/g, "").length;
-      var readDuration = isSingleEmoji(line) ? 2400 : Math.min(5800, 2700 + plainLen * 44);
+      var readDuration = isSingleEmoji(line) ? 6500 : 10000;
 
       // Stop and stand still while chatting!
       mode = "talking";
