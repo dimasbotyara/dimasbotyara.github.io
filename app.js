@@ -55,12 +55,112 @@
   const state = {
     lang: window.__INITIAL_LANG__ || "ru",
     theme: window.__INITIAL_THEME__ || "dark",
+    sound: false,
     activeCategory: "all",
     searchQuery: "",
     highlightedRepo: null,
     termHistory: [],
     termHistoryIdx: -1
   };
+
+  // =========================================================================
+  // GENTLE PROCEDURAL MICRO-SFX (Web Audio API, muted by default, soft volume)
+  // =========================================================================
+  var audioCtx = null;
+
+  function ensureAudioCtx() {
+    if (!audioCtx) {
+      var Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return null;
+      audioCtx = new Ctx();
+    }
+    if (audioCtx.state === "suspended") {
+      audioCtx.resume().catch(function () {});
+    }
+    return audioCtx;
+  }
+
+  function playTone(freqStart, freqEnd, durationSec, type, gainPeak, delaySec) {
+    if (!state.sound) return;
+    var ctx = ensureAudioCtx();
+    if (!ctx) return;
+    try {
+      var now = ctx.currentTime + (delaySec || 0);
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.type = type || "sine";
+      osc.frequency.setValueAtTime(freqStart, now);
+      if (freqEnd && freqEnd !== freqStart) {
+        osc.frequency.exponentialRampToValueAtTime(Math.max(40, freqEnd), now + durationSec);
+      }
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.linearRampToValueAtTime(gainPeak || 0.038, now + Math.min(0.012, durationSec * 0.25));
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + durationSec + 0.015);
+    } catch (e) {}
+  }
+
+  var SFX = {
+    tap: function () {
+      playTone(460, 340, 0.042, "triangle", 0.03);
+    },
+    confirm: function () {
+      playTone(520, 660, 0.065, "sine", 0.036, 0);
+      playTone(660, 780, 0.08, "sine", 0.032, 0.055);
+    },
+    theme: function () {
+      playTone(392, 440, 0.09, "sine", 0.034, 0);
+      playTone(523, 587, 0.11, "triangle", 0.028, 0.055);
+    },
+    term: function () {
+      playTone(310, 360, 0.045, "triangle", 0.024);
+    },
+    crab: function () {
+      playTone(360, 520, 0.06, "triangle", 0.036, 0);
+      playTone(580, 440, 0.055, "sine", 0.028, 0.05);
+    },
+    guest: function (id) {
+      if (id === "reed_toad") {
+        // Gentle soft croak-boop
+        playTone(230, 320, 0.085, "triangle", 0.038, 0);
+        playTone(270, 210, 0.075, "sine", 0.03, 0.07);
+      } else if (id === "cinder_slug") {
+        playTone(260, 220, 0.09, "sine", 0.032, 0);
+        playTone(310, 350, 0.07, "triangle", 0.026, 0.06);
+      } else if (id === "echo_bat") {
+        playTone(760, 620, 0.055, "sine", 0.026, 0);
+        playTone(860, 700, 0.055, "sine", 0.022, 0.05);
+      } else {
+        // Soft airy flutter for moth / wisp
+        playTone(540, 680, 0.065, "sine", 0.03, 0);
+        playTone(700, 820, 0.07, "sine", 0.024, 0.055);
+      }
+    },
+    over77: function () {
+      playTone(440, 390, 0.085, "triangle", 0.036, 0);
+      playTone(330, 270, 0.13, "triangle", 0.034, 0.085);
+    }
+  };
+
+  function setSound(enabled, persist, playFeedback) {
+    state.sound = !!enabled;
+    var btn = document.getElementById("soundToggle");
+    if (btn) {
+      btn.setAttribute("aria-pressed", state.sound ? "true" : "false");
+      btn.setAttribute("title", state.sound ? t("soundOnTooltip") : t("soundOffTooltip"));
+    }
+    if (persist) {
+      try {
+        localStorage.setItem("dimas_sound", state.sound ? "on" : "off");
+      } catch (e) {}
+    }
+    if (state.sound && playFeedback) {
+      SFX.confirm();
+    }
+  }
 
   // =========================================================================
   // HELPERS
@@ -88,26 +188,104 @@
   }
 
   // =========================================================================
-  // THEME MANAGEMENT (Gruvbox Dark default + Light)
+  // THEME MANAGEMENT (Gruvbox Dark default + Light + Catppuccin + Ayu + Nord)
   // =========================================================================
-  function setTheme(theme, persist) {
-    state.theme = theme === "light" ? "light" : "dark";
+  function getThemeObj(id) {
+    var list = SITE_DATA.themes || [];
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].id === id) return list[i];
+    }
+    return list[0];
+  }
+
+  function findThemeByQuery(raw) {
+    var q = String(raw || "").trim().toLowerCase();
+    var list = SITE_DATA.themes || [];
+    if (!q || q === "next") {
+      var curIdx = list.findIndex(function (th) { return th.id === state.theme; });
+      return list[(curIdx + 1) % list.length];
+    }
+    if (q === "random" || q === "rand") {
+      var others = list.filter(function (th) { return th.id !== state.theme; });
+      return others[Math.floor(Math.random() * others.length)] || list[0];
+    }
+    for (var i = 0; i < list.length; i++) {
+      var th = list[i];
+      if (th.id === q || th.short === q || th.aliases.indexOf(q) !== -1) {
+        return th;
+      }
+    }
+    return null;
+  }
+
+  function renderThemeMenu() {
+    var menu = document.getElementById("themeMenu");
+    if (!menu) return;
+    var list = SITE_DATA.themes || [];
+    var head = '<div class="theme-menu-head">' + escapeHtml(t("themeMenuTitle") || "palettes") + "</div>";
+    var items = list.map(function (th) {
+      var active = th.id === state.theme;
+      var dots = th.swatches.map(function (c) {
+        return '<i style="background:' + c + '"></i>';
+      }).join("");
+      return (
+        '<button type="button" class="theme-option' + (active ? " is-active" : "") + '" role="menuitemradio" aria-checked="' + (active ? "true" : "false") + '" data-theme-id="' + th.id + '">' +
+          '<span>' + escapeHtml(th.name[state.lang] || th.name.en) + "</span>" +
+          '<span class="theme-swatches" aria-hidden="true">' + dots + "</span>" +
+        "</button>"
+      );
+    }).join("");
+    menu.innerHTML = head + items;
+
+    menu.querySelectorAll(".theme-option").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        setTheme(btn.dataset.themeId, true, true);
+        closeThemeMenu();
+      });
+    });
+  }
+
+  function openThemeMenu() {
+    var menu = document.getElementById("themeMenu");
+    var btn = document.getElementById("themeToggle");
+    if (!menu || !btn) return;
+    menu.hidden = false;
+    btn.setAttribute("aria-expanded", "true");
+  }
+
+  function closeThemeMenu() {
+    var menu = document.getElementById("themeMenu");
+    var btn = document.getElementById("themeToggle");
+    if (!menu || !btn) return;
+    menu.hidden = true;
+    btn.setAttribute("aria-expanded", "false");
+  }
+
+  function setTheme(themeId, persist, withSound) {
+    var themeObj = getThemeObj(themeId);
+    state.theme = themeObj.id;
     document.documentElement.setAttribute("data-theme", state.theme);
 
     var metaTheme = document.querySelector('meta[name="theme-color"]');
     if (metaTheme) {
-      metaTheme.setAttribute("content", state.theme === "dark" ? "#282828" : "#fbf1c7");
+      metaTheme.setAttribute("content", themeObj.themeColor);
     }
 
     var label = document.getElementById("themeLabel");
     if (label) {
-      label.textContent = state.theme;
+      label.textContent = themeObj.short;
     }
+
+    renderThemeMenu();
 
     if (persist) {
       try {
         localStorage.setItem("dimas_theme", state.theme);
       } catch (e) {}
+    }
+
+    if (withSound) {
+      SFX.theme();
     }
   }
 
@@ -137,12 +315,16 @@
     // Update tooltips
     var themeBtn = document.getElementById("themeToggle");
     if (themeBtn) themeBtn.setAttribute("title", t("themeTooltip"));
+    var soundBtn = document.getElementById("soundToggle");
+    if (soundBtn) soundBtn.setAttribute("title", state.sound ? t("soundOnTooltip") : t("soundOffTooltip"));
     var langSwitch = document.getElementById("langSwitch");
     if (langSwitch) langSwitch.setAttribute("title", t("langTooltip"));
     var tgBtn = document.getElementById("telegramCopyBtn");
     if (tgBtn) tgBtn.setAttribute("title", t("hero.telegramTooltip"));
     var dcBtn = document.getElementById("discordCopyBtn");
     if (dcBtn) dcBtn.setAttribute("title", t("hero.discordTooltip"));
+
+    renderThemeMenu();
 
     // Update static i18n text nodes
     document.querySelectorAll("[data-i18n]").forEach(function (el) {
@@ -624,7 +806,7 @@
       var arg = cmd.slice(4).trim();
       if (arg === "$USER") return '<span class="t-aqua">dimasbotyara</span>';
       if (arg === "$SHELL") return '<span class="t-aqua">/usr/bin/fish</span>';
-      if (arg === "$THEME") return '<span class="t-warn">gruvbox-' + state.theme + "</span>";
+      if (arg === "$THEME") return '<span class="t-warn">' + escapeHtml(getThemeObj(state.theme).name[state.lang]) + "</span>";
       if (arg === "$LANG") return '<span class="t-aqua">' + (state.lang === "ru" ? "ru_RU.UTF-8" : "en_US.UTF-8") + "</span>";
       return escapeHtml(arg || "");
     }
@@ -643,9 +825,64 @@
         ? '<span class="t-purple">нельзя просто так выйти с моей визитки 🐸</span>'
         : '<span class="t-purple">you can\'t just exit my personal page 🐸</span>';
     }
-    if (lower === "theme") {
-      setTheme(state.theme === "dark" ? "light" : "dark", true);
-      return '<span class="t-ok">switched to gruvbox ' + state.theme + "</span>";
+    if (lower === "themes" || lower === "theme list" || lower === "theme -l") {
+      var listHtml = SITE_DATA.themes.map(function (th) {
+        var sw = th.swatches.map(function (c) {
+          return '<span class="crab-swatch" style="background:' + c + '"></span>';
+        }).join("");
+        var mark = th.id === state.theme ? '<span class="t-ok">◀</span> ' : "  ";
+        return mark + '<span class="t-aqua">' + escapeHtml(th.short.padEnd(8, " ")) + "</span> " + sw + ' <span class="t-dim">' + escapeHtml(th.name[state.lang]) + "</span>";
+      }).join("<br/>");
+      return listHtml + '<br/><span class="t-dim">' + (isRu ? "использование: theme gruvbox | light | catppuccin | ayu | nord" : "usage: theme gruvbox | light | catppuccin | ayu | nord") + "</span>";
+    }
+    if (lower === "theme" || lower.indexOf("theme ") === 0) {
+      var thArg = lower === "theme" ? "next" : cmd.slice(5).trim();
+      var targetTheme = findThemeByQuery(thArg);
+      if (!targetTheme) {
+        return isRu
+          ? '<span class="t-err">неизвестная палитра: ' + escapeHtml(thArg) + '</span><br/><span class="t-dim">доступны: gruvbox · light · catppuccin · ayu · nord</span>'
+          : '<span class="t-err">unknown palette: ' + escapeHtml(thArg) + '</span><br/><span class="t-dim">available: gruvbox · light · catppuccin · ayu · nord</span>';
+      }
+      setTheme(targetTheme.id, true, true);
+      return (
+        '<span class="t-ok">palette → ' + escapeHtml(targetTheme.name[state.lang]) + "</span> " +
+        targetTheme.swatches.map(function (c) { return '<span class="crab-swatch" style="background:' + c + '"></span>'; }).join("") +
+        '<br/><span class="t-dim">' + (isRu ? "все палитры: theme list" : "all palettes: theme list") + "</span>"
+      );
+    }
+    if (lower === "sound" || lower === "sfx" || lower.indexOf("sound ") === 0 || lower.indexOf("sfx ") === 0) {
+      var sArg = lower.replace(/^(sound|sfx)\s*/, "").trim();
+      var nextSound = sArg === "on" ? true : (sArg === "off" ? false : !state.sound);
+      setSound(nextSound, true, true);
+      return nextSound
+        ? (isRu ? '<span class="t-ok">🔊 микро-звуки включены</span>' : '<span class="t-ok">🔊 micro-sounds enabled</span>')
+        : (isRu ? '<span class="t-dim">🔇 звуки выключены</span>' : '<span class="t-dim">🔇 micro-sounds muted</span>');
+    }
+    if (lower === "wildlife" || lower === "guests") {
+      var rowsHtml = SITE_DATA.wildlife.map(function (w) {
+        var wName = t("wildlife." + w.id + ".name");
+        var sw = '<span class="crab-swatch" style="background:' + rgbStr(w.baseColor) + '"></span>';
+        return sw + ' <span class="t-aqua">' + escapeHtml(wName) + '</span> <span class="t-dim">(' + escapeHtml(w.biome) + ", " + escapeHtml(w.movement) + ")</span>";
+      }).join("<br/>");
+      return (
+        '<span class="t-warn">' + (isRu ? "жители pygame-slide-survivors:" : "pygame-slide-survivors residents:") + "</span><br/>" +
+        '<span class="crab-swatch" style="background:' + rgbStr(SITE_DATA.tideCrab.baseColor) + '"></span> <span class="t-orange">' + escapeHtml(t("crab.name")) + '</span> <span class="t-dim">(coast, permanent)</span><br/>' +
+        rowsHtml +
+        '<br/><span class="t-dim">' + (isRu ? "позвать гостя: guest (или guest moth / bat / wisp / toad / slug)" : "summon a guest: guest (or guest moth / bat / wisp / toad / slug)") + "</span>"
+      );
+    }
+    if (lower === "guest" || lower === "summon" || lower.indexOf("guest ") === 0 || lower.indexOf("summon ") === 0) {
+      var gArg = lower.replace(/^(guest|summon)\s*/, "").trim();
+      var spawned = typeof summonGuest === "function" ? summonGuest(gArg) : null;
+      if (!spawned) {
+        return isRu
+          ? '<span class="t-err">не нашёл такого жителя: ' + escapeHtml(gArg) + '</span><br/><span class="t-dim">доступны: moth · bat · wisp · toad · slug</span>'
+          : '<span class="t-err">resident not found: ' + escapeHtml(gArg) + '</span><br/><span class="t-dim">try: moth · bat · wisp · toad · slug</span>';
+      }
+      return (
+        '<span class="t-ok">✦ ' + escapeHtml(t("wildlife." + spawned.id + ".name")) + "</span> " +
+        '<span class="t-dim">' + (isRu ? "уже в пути к крабику ↓ (тыкни, пока не улетел!)" : "is dropping by below ↓ (boop before they leave!)") + "</span>"
+      );
     }
     if (lower === "lang" || lower === "ru" || lower === "en") {
       var nextLang = (lower === "ru" || lower === "en") ? lower : (state.lang === "ru" ? "en" : "ru");
@@ -674,9 +911,9 @@
     if (lower === "help") {
       return isRu
         ? '<span class="t-warn">команды:</span><br/>' +
-          '<span class="t-aqua">touch grass</span> · <span class="t-aqua">sudo touch grass</span> · <span class="t-aqua">fastfetch</span> · <span class="t-aqua">htop</span> · <span class="t-aqua">battery</span> · <span class="t-aqua">uptime</span> · <span class="t-aqua">uname</span> · <span class="t-aqua">date</span> · <span class="t-aqua">pwd</span> · <span class="t-aqua">ls</span> · <span class="t-aqua">cat readme</span> · <span class="t-aqua">whoami</span> · <span class="t-aqua">contacts</span> · <span class="t-aqua">crab</span> · <span class="t-aqua">frog</span> · <span class="t-aqua">cowsay</span> · <span class="t-aqua">pacman -Syu</span> · <span class="t-aqua">matrix</span> · <span class="t-aqua">fortune</span> · <span class="t-aqua">ping</span> · <span class="t-aqua">echo</span> · <span class="t-aqua">random</span> · <span class="t-aqua">theme</span> · <span class="t-aqua">lang</span> · <span class="t-aqua">clear</span>'
+          '<span class="t-aqua">touch grass</span> · <span class="t-aqua">sudo touch grass</span> · <span class="t-aqua">fastfetch</span> · <span class="t-aqua">htop</span> · <span class="t-aqua">battery</span> · <span class="t-aqua">uptime</span> · <span class="t-aqua">uname</span> · <span class="t-aqua">date</span> · <span class="t-aqua">pwd</span> · <span class="t-aqua">ls</span> · <span class="t-aqua">cat readme</span> · <span class="t-aqua">whoami</span> · <span class="t-aqua">contacts</span> · <span class="t-aqua">crab</span> · <span class="t-aqua">wildlife</span> · <span class="t-aqua">guest</span> · <span class="t-aqua">frog</span> · <span class="t-aqua">cowsay</span> · <span class="t-aqua">pacman -Syu</span> · <span class="t-aqua">matrix</span> · <span class="t-aqua">fortune</span> · <span class="t-aqua">ping</span> · <span class="t-aqua">echo</span> · <span class="t-aqua">random</span> · <span class="t-aqua">theme</span> · <span class="t-aqua">theme list</span> · <span class="t-aqua">sound</span> · <span class="t-aqua">lang</span> · <span class="t-aqua">clear</span>'
         : '<span class="t-warn">commands:</span><br/>' +
-          '<span class="t-aqua">touch grass</span> · <span class="t-aqua">sudo touch grass</span> · <span class="t-aqua">fastfetch</span> · <span class="t-aqua">htop</span> · <span class="t-aqua">battery</span> · <span class="t-aqua">uptime</span> · <span class="t-aqua">uname</span> · <span class="t-aqua">date</span> · <span class="t-aqua">pwd</span> · <span class="t-aqua">ls</span> · <span class="t-aqua">cat readme</span> · <span class="t-aqua">whoami</span> · <span class="t-aqua">contacts</span> · <span class="t-aqua">crab</span> · <span class="t-aqua">frog</span> · <span class="t-aqua">cowsay</span> · <span class="t-aqua">pacman -Syu</span> · <span class="t-aqua">matrix</span> · <span class="t-aqua">fortune</span> · <span class="t-aqua">ping</span> · <span class="t-aqua">echo</span> · <span class="t-aqua">random</span> · <span class="t-aqua">theme</span> · <span class="t-aqua">lang</span> · <span class="t-aqua">clear</span>';
+          '<span class="t-aqua">touch grass</span> · <span class="t-aqua">sudo touch grass</span> · <span class="t-aqua">fastfetch</span> · <span class="t-aqua">htop</span> · <span class="t-aqua">battery</span> · <span class="t-aqua">uptime</span> · <span class="t-aqua">uname</span> · <span class="t-aqua">date</span> · <span class="t-aqua">pwd</span> · <span class="t-aqua">ls</span> · <span class="t-aqua">cat readme</span> · <span class="t-aqua">whoami</span> · <span class="t-aqua">contacts</span> · <span class="t-aqua">crab</span> · <span class="t-aqua">wildlife</span> · <span class="t-aqua">guest</span> · <span class="t-aqua">frog</span> · <span class="t-aqua">cowsay</span> · <span class="t-aqua">pacman -Syu</span> · <span class="t-aqua">matrix</span> · <span class="t-aqua">fortune</span> · <span class="t-aqua">ping</span> · <span class="t-aqua">echo</span> · <span class="t-aqua">random</span> · <span class="t-aqua">theme</span> · <span class="t-aqua">theme list</span> · <span class="t-aqua">sound</span> · <span class="t-aqua">lang</span> · <span class="t-aqua">clear</span>';
     }
     return isRu
       ? '<span class="t-err">fish: неизвестная команда: ' + escapeHtml(cmd) + '</span><br/><span class="t-dim">напиши help чтобы глянуть, что я умею</span>'
@@ -706,6 +943,7 @@
     var timerId = setTimeout(function () {
       if (resNode && resNode.isConnected) {
         resNode.innerHTML = resolveCommand(cmd);
+        SFX.term();
         if (termOut) termOut.scrollTop = termOut.scrollHeight;
       }
     }, delay);
@@ -763,24 +1001,24 @@
   }
 
   // =========================================================================
-  // TIDE CRAB (Приливной краб) — 1:1 sprite & 4-frame gait from wildlife.py
+  // TIDE CRAB + VISITING WILDLIFE — 1:1 sprites & 4-frame gaits from wildlife.py
   // =========================================================================
   function rgbStr(arr) {
     return "rgb(" + arr[0] + "," + arr[1] + "," + arr[2] + ")";
   }
 
-  function buildCrabRects(frame, flashing) {
-    var crab = SITE_DATA.tideCrab;
-    var rows = crab.pixels;
+  function buildResidentRects(spec, frame, flashing) {
+    var rows = spec.pixels;
     var height = rows.length;
     var width = rows[0].length;
     var palette = [
-      flashing ? "#ffffff" : rgbStr(crab.baseColor),
-      rgbStr(crab.highlightColor),
-      rgbStr(crab.eyeColor),
-      rgbStr(crab.darkColor)
+      flashing ? "#ffffff" : rgbStr(spec.baseColor),
+      rgbStr(spec.highlightColor),
+      rgbStr(spec.eyeColor),
+      rgbStr(spec.darkColor)
     ];
     var phase = [0, 1, 0, -1][frame % 4];
+    var isFlyer = spec.movement === "flyer";
     var rects = "";
 
     for (var y = 0; y < height; y++) {
@@ -789,7 +1027,11 @@
         var cell = row[x];
         if (cell === ".") continue;
         var dy = 0;
-        if (y >= height - 2 && (x < 3 || x >= width - 3)) {
+        if (isFlyer) {
+          if (x < 3 || x >= width - 3) {
+            dy = phase;
+          }
+        } else if (y >= height - 2 && (x < 3 || x >= width - 3)) {
           dy = x < Math.floor(width / 2) ? phase : -phase;
         }
         var color = palette[Number(cell) - 1];
@@ -799,47 +1041,55 @@
     return rects;
   }
 
+  function buildCrabRects(frame, flashing) {
+    return buildResidentRects(SITE_DATA.tideCrab, frame, flashing);
+  }
+
   var boopCrab = null;
+  var summonGuest = null;
   var refreshCrabLocale = null;
 
   function initTideCrab() {
     var stage = document.getElementById("crabStage");
     var actor = document.getElementById("crabActor");
     var svg = document.getElementById("crabSvg");
+    var guestActor = document.getElementById("guestActor");
+    var guestSvg = document.getElementById("guestSvg");
+    var guestBadge = document.getElementById("guestBadge");
+    var hintTag = document.getElementById("crabHintTag");
     var bubbleBar = document.getElementById("crabBubbleBar");
+    var speakerEl = document.getElementById("crabSpeaker");
     var speech = document.getElementById("crabSpeech");
     if (!stage || !actor || !svg) return;
 
-    var frame = 0;
-    var posX = 24;
-    var dir = 1;
-    var flashing = false;
-    var mode = "idle"; // idle | walk_slow | walk_normal | talking
-    var nextStepAt = 0;
-    var modeUntil = 0;
-    var lastQuoteIdx = -1;
-    var activeQuoteIdx = -1;
-    var quoteDeck = [];
+    var GUEST_IDLE_LEAVE_MS = 20000;
     var reducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    function nextShuffledQuoteIdx(total) {
-      if (quoteDeck.length === 0) {
-        for (var i = 0; i < total; i++) quoteDeck.push(i);
-        // Fisher-Yates shuffle
-        for (var j = quoteDeck.length - 1; j > 0; j--) {
-          var k = Math.floor(Math.random() * (j + 1));
-          var tmp = quoteDeck[j];
-          quoteDeck[j] = quoteDeck[k];
-          quoteDeck[k] = tmp;
+    function randRange(min, max) {
+      return min + Math.random() * (max - min);
+    }
+
+    function createDeckPuller() {
+      var deck = [];
+      var last = -1;
+      return function (total) {
+        if (deck.length === 0) {
+          for (var i = 0; i < total; i++) deck.push(i);
+          for (var j = deck.length - 1; j > 0; j--) {
+            var k = Math.floor(Math.random() * (j + 1));
+            var tmp = deck[j];
+            deck[j] = deck[k];
+            deck[k] = tmp;
+          }
+          if (deck.length > 1 && deck[deck.length - 1] === last) {
+            var swap = deck[0];
+            deck[0] = deck[deck.length - 1];
+            deck[deck.length - 1] = swap;
+          }
         }
-        // Avoid repeating the previous quote right across deck boundaries
-        if (quoteDeck.length > 1 && quoteDeck[quoteDeck.length - 1] === lastQuoteIdx) {
-          var swap = quoteDeck[0];
-          quoteDeck[0] = quoteDeck[quoteDeck.length - 1];
-          quoteDeck[quoteDeck.length - 1] = swap;
-        }
-      }
-      return quoteDeck.pop();
+        last = deck.pop();
+        return last;
+      };
     }
 
     function formatCrabLine(str) {
@@ -852,164 +1102,459 @@
       });
     }
 
-    function randRange(min, max) {
-      return min + Math.random() * (max - min);
-    }
-
-    function getMaxX() {
-      return Math.max(20, stage.clientWidth - 72);
-    }
-
-    function drawCrab() {
-      svg.innerHTML = buildCrabRects(frame, flashing);
-      actor.style.transform = "translateX(" + Math.round(posX) + "px)";
-    }
-
     function isSingleEmoji(str) {
       var trimmed = String(str || "").trim();
       return trimmed.length > 0 && trimmed.length <= 4 && !/[a-zA-Zа-яА-ЯёЁ0-9]/.test(trimmed);
     }
 
-    function showSpeech(text) {
+    // Shared speech state (either "crab" or a wildlife guest id)
+    var activeSpeaker = null; // null | { kind: "crab" | "guest", id: string, quoteIdx: number, color: string }
+
+    function renderBubble() {
       if (!bubbleBar || !speech) return;
-      speech.innerHTML = formatCrabLine(text);
-      speech.classList.toggle("is-emoji", isSingleEmoji(text));
+      if (!activeSpeaker) {
+        bubbleBar.hidden = true;
+        return;
+      }
+      var nameText = activeSpeaker.kind === "crab"
+        ? t("crab.name")
+        : t("wildlife." + activeSpeaker.id + ".name");
+      var quotes = activeSpeaker.kind === "crab"
+        ? (t("crab.quotes") || ["🦀"])
+        : (t("wildlife." + activeSpeaker.id + ".quotes") || ["✨"]);
+      var line = quotes[activeSpeaker.quoteIdx] || quotes[0];
+
+      if (speakerEl) {
+        speakerEl.textContent = nameText + ":";
+        speakerEl.style.color = activeSpeaker.color;
+      }
+      speech.innerHTML = formatCrabLine(line);
+      speech.classList.toggle("is-emoji", isSingleEmoji(line));
       bubbleBar.hidden = false;
     }
 
-    function hideSpeech() {
-      if (!bubbleBar) return;
-      bubbleBar.hidden = true;
-      activeQuoteIdx = -1;
+    function hideSpeechFor(kind) {
+      if (activeSpeaker && activeSpeaker.kind === kind) {
+        activeSpeaker = null;
+        renderBubble();
+      }
     }
 
-    function pickNextMode(now) {
+    // ---- TIDE CRAB STATE ----
+    var crabFrame = 0;
+    var crabX = 24;
+    var crabDir = 1;
+    var crabFlashing = false;
+    var crabMode = "idle"; // idle | walk_slow | walk_normal | talking
+    var crabNextStepAt = 0;
+    var crabModeUntil = 0;
+    var pullCrabQuote = createDeckPuller();
+
+    function getMaxCrabX() {
+      return Math.max(20, stage.clientWidth - 72);
+    }
+
+    function drawCrab() {
+      svg.innerHTML = buildCrabRects(crabFrame, crabFlashing);
+      actor.style.transform = "translateX(" + Math.round(crabX) + "px)";
+    }
+
+    function pickNextCrabMode(now) {
       var r = Math.random();
       if (r < 0.36) {
-        // Stand completely still with no animation
-        mode = "idle";
-        frame = 0;
-        modeUntil = now + randRange(1600, 4200);
+        crabMode = "idle";
+        crabFrame = 0;
+        crabModeUntil = now + randRange(1600, 4200);
       } else if (r < 0.72) {
-        // Slow unhurried stroll
-        mode = "walk_slow";
-        if (Math.random() < 0.4) dir = -dir;
-        modeUntil = now + randRange(2400, 5200);
+        crabMode = "walk_slow";
+        if (Math.random() < 0.4) crabDir = -crabDir;
+        crabModeUntil = now + randRange(2400, 5200);
       } else {
-        // Normal cheerful scuttle
-        mode = "walk_normal";
-        if (Math.random() < 0.4) dir = -dir;
-        modeUntil = now + randRange(1500, 3800);
+        crabMode = "walk_normal";
+        if (Math.random() < 0.4) crabDir = -crabDir;
+        crabModeUntil = now + randRange(1500, 3800);
       }
       drawCrab();
     }
 
     drawCrab();
-    pickNextMode(Date.now());
-
-    refreshCrabLocale = function () {
-      if (mode === "talking" && activeQuoteIdx >= 0) {
-        var quotes = t("crab.quotes") || [];
-        if (quotes[activeQuoteIdx]) {
-          showSpeech(quotes[activeQuoteIdx]);
-        }
-      }
-    };
+    pickNextCrabMode(Date.now());
 
     boopCrab = function () {
       var quotes = t("crab.quotes") || ["🦀"];
-      var idx = nextShuffledQuoteIdx(quotes.length);
-      lastQuoteIdx = idx;
-      activeQuoteIdx = idx;
-
+      var idx = pullCrabQuote(quotes.length);
       var line = quotes[idx];
       var readDuration = isSingleEmoji(line) ? 6500 : 10000;
 
-      // Stop and stand still while chatting!
-      mode = "talking";
-      frame = 0;
-      flashing = true;
-      modeUntil = Date.now() + readDuration;
+      crabMode = "talking";
+      crabFrame = 0;
+      crabFlashing = true;
+      crabModeUntil = Date.now() + readDuration;
       drawCrab();
-      showSpeech(line);
+
+      activeSpeaker = {
+        kind: "crab",
+        id: "tide_crab",
+        quoteIdx: idx,
+        color: rgbStr(SITE_DATA.tideCrab.baseColor)
+      };
+      renderBubble();
+      SFX.crab();
 
       actor.classList.remove("is-hop");
       void actor.offsetWidth;
       actor.classList.add("is-hop");
 
       setTimeout(function () {
-        flashing = false;
+        crabFlashing = false;
         drawCrab();
       }, 150);
     };
 
-    stage.addEventListener("click", boopCrab);
-    stage.addEventListener("keydown", function (e) {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        boopCrab();
-      }
+    actor.addEventListener("click", function (e) {
+      e.stopPropagation();
+      boopCrab();
     });
+
+    // ---- VISITING WILDLIFE GUESTS STATE ----
+    var wildlifeList = SITE_DATA.wildlife || [];
+    var pullGuestSpec = createDeckPuller();
+    var guestQuotePullers = {};
+    wildlifeList.forEach(function (w) {
+      guestQuotePullers[w.id] = createDeckPuller();
+    });
+
+    var guest = {
+      spec: null,
+      state: "absent", // absent | entering | roaming | talking | leaving
+      x: -60,
+      y: 12,
+      baseY: 16,
+      dir: 1,
+      vx: 2.6,
+      frame: 0,
+      flashing: false,
+      phaseTick: 0,
+      hopPhase: 0,
+      nextAnimAt: 0,
+      talkUntil: 0,
+      lastClickedAt: 0,
+      nextSpawnAt: Date.now() + 3500
+    };
+
+    function updateGuestHeaderUI() {
+      if (!guestBadge || !hintTag) return;
+      if (guest.spec && guest.state !== "absent" && guest.state !== "leaving") {
+        var gName = t("wildlife." + guest.spec.id + ".name");
+        guestBadge.innerHTML =
+          '<span class="guest-pill-dot" style="background:' + rgbStr(guest.spec.baseColor) + '"></span>' +
+          '<span>' + escapeHtml(t("wildlife.visitingLabel") + " " + gName) + "</span>";
+        guestBadge.hidden = false;
+        hintTag.hidden = true;
+      } else {
+        guestBadge.hidden = true;
+        hintTag.hidden = false;
+      }
+    }
+
+    function drawGuest() {
+      if (!guestActor || !guestSvg || !guest.spec) return;
+      var w = guest.spec.pixels[0].length + 2;
+      var h = guest.spec.pixels.length + 2;
+      guestSvg.setAttribute("viewBox", "0 0 " + w + " " + h);
+      guestSvg.setAttribute("width", String(w * 4));
+      guestSvg.setAttribute("height", String(h * 4));
+      guestSvg.innerHTML = buildResidentRects(guest.spec, guest.frame, guest.flashing);
+      guestActor.style.transform = "translate3d(" + Math.round(guest.x) + "px, " + Math.round(guest.y) + "px, 0)";
+    }
+
+    function spawnGuest(specOverride) {
+      if (!guestActor || !wildlifeList.length) return null;
+      var spec = specOverride || wildlifeList[pullGuestSpec(wildlifeList.length)];
+      var stageW = Math.max(220, stage.clientWidth);
+      // Enter from the opposite side of Tide Crab so they greet each other cleanly
+      var fromLeft = crabX > stageW * 0.45;
+
+      guest.spec = spec;
+      guest.state = "entering";
+      guest.dir = fromLeft ? 1 : -1;
+      guest.x = fromLeft ? -52 : stageW + 12;
+      guest.frame = 0;
+      guest.flashing = false;
+      guest.phaseTick = Math.random() * Math.PI * 2;
+      guest.hopPhase = 0;
+
+      if (spec.movement === "flyer") {
+        guest.baseY = randRange(8, 22);
+        guest.y = guest.baseY;
+        guest.vx = spec.id === "clover_moth" ? 3.2 : (spec.id === "echo_bat" ? 3.6 : 2.3);
+        guestActor.classList.add("is-flyer");
+      } else if (spec.movement === "hopper") {
+        guest.baseY = 44;
+        guest.y = guest.baseY;
+        guest.vx = 2.6;
+        guestActor.classList.remove("is-flyer");
+      } else {
+        guest.baseY = 48;
+        guest.y = guest.baseY;
+        guest.vx = 1.4;
+        guestActor.classList.remove("is-flyer");
+      }
+
+      guest.lastClickedAt = Date.now();
+      guestActor.hidden = false;
+      guestActor.setAttribute("aria-label", t("wildlife." + spec.id + ".name"));
+      drawGuest();
+      updateGuestHeaderUI();
+      return spec;
+    }
+
+    function boopGuest() {
+      if (!guest.spec || guest.state === "absent") return;
+      var spec = guest.spec;
+      var quotes = t("wildlife." + spec.id + ".quotes") || ["✨"];
+      var pull = guestQuotePullers[spec.id];
+      var idx = pull ? pull(quotes.length) : 0;
+      var line = quotes[idx];
+      var readDuration = isSingleEmoji(line) ? 6500 : 10000;
+      var now = Date.now();
+
+      // Stop right in place while chatting & reset 20s idle timer!
+      guest.state = "talking";
+      guest.frame = 0;
+      guest.flashing = true;
+      guest.talkUntil = now + readDuration;
+      guest.lastClickedAt = now;
+      if (spec.movement === "hopper") {
+        guest.y = guest.baseY;
+      }
+      drawGuest();
+
+      activeSpeaker = {
+        kind: "guest",
+        id: spec.id,
+        quoteIdx: idx,
+        color: rgbStr(spec.baseColor)
+      };
+      renderBubble();
+      updateGuestHeaderUI();
+      SFX.guest(spec.id);
+
+      guestActor.classList.remove("is-boop");
+      void guestActor.offsetWidth;
+      guestActor.classList.add("is-boop");
+
+      setTimeout(function () {
+        guest.flashing = false;
+        drawGuest();
+      }, 150);
+    }
+
+    summonGuest = function (query) {
+      var q = String(query || "").trim().toLowerCase();
+      var chosen = null;
+      if (q) {
+        chosen = wildlifeList.find(function (w) {
+          return (
+            w.id === q ||
+            w.id.indexOf(q) !== -1 ||
+            w.biome === q ||
+            t("wildlife." + w.id + ".name").toLowerCase().indexOf(q) !== -1
+          );
+        });
+        if (!chosen) return null;
+      }
+      hideSpeechFor("guest");
+      return spawnGuest(chosen);
+    };
+
+    if (guestActor) {
+      guestActor.addEventListener("click", function (e) {
+        e.stopPropagation();
+        boopGuest();
+      });
+    }
+
+    if (guestBadge) {
+      guestBadge.addEventListener("click", function () {
+        boopGuest();
+      });
+    }
+
+    refreshCrabLocale = function () {
+      renderBubble();
+      updateGuestHeaderUI();
+      if (guest.spec && guestActor) {
+        guestActor.setAttribute("aria-label", t("wildlife." + guest.spec.id + ".name"));
+      }
+    };
 
     window.addEventListener("resize", function () {
-      var maxX = getMaxX();
-      if (posX > maxX) {
-        posX = maxX;
+      var maxX = getMaxCrabX();
+      if (crabX > maxX) {
+        crabX = maxX;
         drawCrab();
+      }
+      if (guest.spec && guest.state === "roaming") {
+        var maxGX = Math.max(20, stage.clientWidth - 60);
+        if (guest.x > maxGX) {
+          guest.x = maxGX;
+          drawGuest();
+        }
       }
     });
 
-    if (!reducedMotion) {
-      setInterval(function () {
-        var now = Date.now();
-
-        if (mode === "talking") {
-          // Stay completely still while talking until timer finishes
-          if (now >= modeUntil) {
-            hideSpeech();
-            pickNextMode(now);
-          }
-          return;
-        }
-
-        if (now >= modeUntil) {
-          pickNextMode(now);
-          return;
-        }
-
-        if (mode === "idle") {
-          return;
-        }
-
-        var stepDelay = mode === "walk_slow" ? 370 : 185;
-        var stepPx = mode === "walk_slow" ? 2.5 : 5.5;
-        if (now < nextStepAt) return;
-        nextStepAt = now + stepDelay;
-
-        var maxX = getMaxX();
-        posX += dir * stepPx;
-        if (posX >= maxX) {
-          posX = maxX;
-          dir = -1;
-          mode = "idle";
-          frame = 0;
-          modeUntil = now + randRange(900, 2400);
-          drawCrab();
-          return;
-        } else if (posX <= 12) {
-          posX = 12;
-          dir = 1;
-          mode = "idle";
-          frame = 0;
-          modeUntil = now + randRange(900, 2400);
-          drawCrab();
-          return;
-        }
-
-        frame = (frame + 1) % 4;
-        drawCrab();
-      }, 80);
+    if (reducedMotion) {
+      // Still show one friendly visitor statically on reduced-motion devices
+      var staticSpec = spawnGuest(wildlifeList[0]);
+      if (staticSpec) {
+        guest.state = "roaming";
+        guest.x = Math.max(90, Math.round(stage.clientWidth * 0.62));
+        drawGuest();
+        updateGuestHeaderUI();
+      }
+      return;
     }
+
+    setInterval(function () {
+      var now = Date.now();
+      var stageW = Math.max(220, stage.clientWidth);
+
+      // --- 1. Update Tide Crab ---
+      if (crabMode === "talking") {
+        if (now >= crabModeUntil) {
+          hideSpeechFor("crab");
+          pickNextCrabMode(now);
+        }
+      } else if (now >= crabModeUntil) {
+        pickNextCrabMode(now);
+      } else if (crabMode !== "idle") {
+        var stepDelay = crabMode === "walk_slow" ? 370 : 185;
+        var stepPx = crabMode === "walk_slow" ? 2.5 : 5.5;
+        if (now >= crabNextStepAt) {
+          crabNextStepAt = now + stepDelay;
+          var maxX = getMaxCrabX();
+          crabX += crabDir * stepPx;
+          if (crabX >= maxX) {
+            crabX = maxX;
+            crabDir = -1;
+            crabMode = "idle";
+            crabFrame = 0;
+            crabModeUntil = now + randRange(900, 2400);
+          } else if (crabX <= 12) {
+            crabX = 12;
+            crabDir = 1;
+            crabMode = "idle";
+            crabFrame = 0;
+            crabModeUntil = now + randRange(900, 2400);
+          } else {
+            crabFrame = (crabFrame + 1) % 4;
+          }
+          drawCrab();
+        }
+      }
+
+      // --- 2. Update Visiting Wildlife Guest ---
+      if (guest.state === "absent") {
+        if (now >= guest.nextSpawnAt) {
+          spawnGuest();
+        }
+        return;
+      }
+
+      if (guest.state === "talking") {
+        // Stay completely motionless while talking
+        if (now >= guest.talkUntil) {
+          hideSpeechFor("guest");
+          guest.state = "roaming";
+        }
+        return;
+      }
+
+      var spec = guest.spec;
+      if (!spec) return;
+
+      var minGX = 16;
+      var maxGX = Math.max(40, stageW - 64);
+
+      // Leave if nobody clicked this guest for 20 seconds!
+      if (guest.state === "roaming" && now - guest.lastClickedAt >= GUEST_IDLE_LEAVE_MS) {
+        guest.state = "leaving";
+        guest.dir = guest.x > stageW / 2 ? 1 : -1;
+        hideSpeechFor("guest");
+        updateGuestHeaderUI();
+      }
+
+      // Advance sprite gait/wing animation
+      var animDelay = spec.movement === "flyer" ? 130 : (spec.movement === "hopper" ? 190 : 280);
+      if (now >= guest.nextAnimAt) {
+        guest.nextAnimAt = now + animDelay;
+        guest.frame = (guest.frame + 1) % 4;
+      }
+
+      if (guest.state === "entering") {
+        var enterSpeed = Math.max(2.6, guest.vx * 1.15);
+        guest.x += guest.dir * enterSpeed;
+        if (spec.movement === "flyer") {
+          guest.phaseTick += 0.16;
+          guest.y = guest.baseY + Math.sin(guest.phaseTick) * 6;
+        } else if (spec.movement === "hopper") {
+          guest.hopPhase = (guest.hopPhase + 0.24) % Math.PI;
+          guest.y = guest.baseY - Math.sin(guest.hopPhase) * 14;
+        }
+        if ((guest.dir === 1 && guest.x >= minGX + 24) || (guest.dir === -1 && guest.x <= maxGX - 24)) {
+          guest.state = "roaming";
+          guest.lastClickedAt = now; // Start 20s idle countdown once arrived
+        }
+        drawGuest();
+        return;
+      }
+
+      if (guest.state === "roaming") {
+        guest.x += guest.dir * guest.vx;
+        if (guest.x >= maxGX) {
+          guest.x = maxGX;
+          guest.dir = -1;
+        } else if (guest.x <= minGX) {
+          guest.x = minGX;
+          guest.dir = 1;
+        }
+
+        if (spec.movement === "flyer") {
+          guest.phaseTick += 0.14;
+          guest.y = guest.baseY + Math.sin(guest.phaseTick) * 8;
+        } else if (spec.movement === "hopper") {
+          guest.hopPhase += 0.2;
+          var arc = Math.sin(guest.hopPhase);
+          guest.y = arc > 0 ? guest.baseY - arc * 15 : guest.baseY;
+        } else {
+          guest.y = guest.baseY;
+        }
+        drawGuest();
+        return;
+      }
+
+      if (guest.state === "leaving") {
+        var leaveSpeed = Math.max(3.4, guest.vx * 1.45);
+        guest.x += guest.dir * leaveSpeed;
+        if (spec.movement === "flyer") {
+          guest.phaseTick += 0.2;
+          guest.y = Math.max(-28, guest.y - 0.8 + Math.sin(guest.phaseTick) * 3);
+        } else if (spec.movement === "hopper") {
+          guest.hopPhase = (guest.hopPhase + 0.28) % Math.PI;
+          guest.y = guest.baseY - Math.sin(guest.hopPhase) * 14;
+        }
+        drawGuest();
+
+        if (guest.x < -72 || guest.x > stageW + 32) {
+          guest.state = "absent";
+          guest.spec = null;
+          guest.nextSpawnAt = now + randRange(5000, 8500);
+          guestActor.hidden = true;
+          updateGuestHeaderUI();
+        }
+      }
+    }, 65);
   }
 
   // =========================================================================
@@ -1099,6 +1644,7 @@
       calc.resetNext = true;
       setStatus("over77");
       renderCalc("> 77 🤭", exprText);
+      SFX.over77();
     }
 
     function clearAll() {
@@ -1214,14 +1760,19 @@
       var btn = e.target.closest("button.calc-key");
       if (!btn) return;
       if (btn.dataset.digit !== undefined) {
+        SFX.tap();
         inputDigit(btn.dataset.digit);
       } else if (btn.dataset.op) {
+        SFX.tap();
         inputOp(btn.dataset.op);
       } else if (btn.dataset.action === "dot") {
+        SFX.tap();
         inputDot();
       } else if (btn.dataset.action === "clear") {
+        SFX.tap();
         clearAll();
       } else if (btn.dataset.action === "back") {
+        SFX.tap();
         if (calc.resetNext) {
           clearAll();
         } else {
@@ -1230,12 +1781,16 @@
           renderCalc();
         }
       } else if (btn.dataset.action === "sign") {
+        SFX.tap();
         if (calc.current !== "0") {
           calc.current = calc.current.indexOf("-") === 0 ? calc.current.slice(1) : "-" + calc.current;
           renderCalc();
         }
       } else if (btn.dataset.action === "eq") {
         evaluate();
+        if (calc.statusKind === "idle") {
+          SFX.confirm();
+        }
       }
     });
   }
@@ -1271,6 +1826,7 @@
     var timer = null;
     btn.addEventListener("click", function () {
       copyText(copyValue).then(function () {
+        SFX.confirm();
         btn.classList.add("is-copied");
         label.textContent = t("hero.copied");
         clearTimeout(timer);
@@ -1308,24 +1864,52 @@
   // WIRE UP EVENTS & BOOT
   // =========================================================================
   function boot() {
-    setTheme(state.theme, false);
+    var savedSound = false;
+    try {
+      savedSound = localStorage.getItem("dimas_sound") === "on";
+    } catch (e) {}
+
+    setTheme(state.theme, false, false);
     setLang(state.lang, false);
+    setSound(savedSound, false, false);
     initTideCrab();
     initCalculator();
     initContactCopy();
     initTerminal();
 
-    // Theme button
+    // Visible Palette Picker dropdown
+    var themePicker = document.getElementById("themePicker");
     var themeBtn = document.getElementById("themeToggle");
-    if (themeBtn) {
-      themeBtn.addEventListener("click", function () {
-        setTheme(state.theme === "dark" ? "light" : "dark", true);
+    var themeMenu = document.getElementById("themeMenu");
+    if (themeBtn && themeMenu) {
+      themeBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        if (themeMenu.hidden) {
+          openThemeMenu();
+        } else {
+          closeThemeMenu();
+        }
+      });
+
+      document.addEventListener("click", function (e) {
+        if (!themeMenu.hidden && themePicker && !themePicker.contains(e.target)) {
+          closeThemeMenu();
+        }
+      });
+    }
+
+    // Sound toggle button
+    var soundBtn = document.getElementById("soundToggle");
+    if (soundBtn) {
+      soundBtn.addEventListener("click", function () {
+        setSound(!state.sound, true, true);
       });
     }
 
     // Language buttons
     document.querySelectorAll(".lang-btn").forEach(function (btn) {
       btn.addEventListener("click", function () {
+        SFX.tap();
         setLang(btn.dataset.lang, true);
       });
     });
@@ -1342,19 +1926,28 @@
     // Random repo roller
     var randomBtn = document.getElementById("randomRepoBtn");
     if (randomBtn) {
-      randomBtn.addEventListener("click", rollRandomRepo);
+      randomBtn.addEventListener("click", function () {
+        SFX.tap();
+        rollRandomRepo();
+      });
     }
 
     // Keyboard shortcuts (vim / linux nerd friendly!)
     document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") {
+        closeThemeMenu();
+        return;
+      }
       var tag = document.activeElement && document.activeElement.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || e.ctrlKey || e.metaKey || e.altKey) {
         return;
       }
       var k = e.key.toLowerCase();
       if (k === "t" || k === "е") {
-        setTheme(state.theme === "dark" ? "light" : "dark", true);
+        var nextTh = findThemeByQuery("next");
+        if (nextTh) setTheme(nextTh.id, true, true);
       } else if (k === "l" || k === "д") {
+        SFX.tap();
         setLang(state.lang === "ru" ? "en" : "ru", true);
       } else if (e.key === "/") {
         e.preventDefault();
