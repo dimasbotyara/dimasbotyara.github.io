@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>dimasbotyara — просто визитка</title>
+  <meta name="description" content="привет, я димас ботяра. делаю игры на pygame, self-hosted штуки для локалки и утилиты под линукс. gruvbox внутри." />
+  <meta name="theme-color" content="#282828" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+
+  <!-- Anti-FOUC: apply saved theme (default gruvbox dark) & browser/saved locale immediately -->
+  <script>
+    (function () {
+      try {
+        var savedTheme = localStorage.getItem("dimas_theme");
+        var theme = (savedTheme === "light" || savedTheme === "dark") ? savedTheme : "dark";
+        document.documentElement.setAttribute("data-theme", theme);
+
+        var params = new URLSearchParams(window.location.search);
+        var qLang = params.get("lang");
+        var savedLang = localStorage.getItem("dimas_lang");
+        var lang = "en";
+        if (qLang === "ru" || qLang === "en") {
+          lang = qLang;
+        } else if (savedLang === "ru" || savedLang === "en") {
+          lang = savedLang;
+        } else {
+          var langs = navigator.languages && navigator.languages.length
+            ? navigator.languages
+            : [navigator.language || "en"];
+          for (var i = 0; i < langs.length; i++) {
+            var code = String(langs[i]).toLowerCase();
+            if (code.indexOf("ru") === 0 || code.indexOf("be") === 0 || code.indexOf("kk") === 0) {
+              lang = "ru";
+              break;
+            }
+            if (code.indexOf("en") === 0) {
+              lang = "en";
+              break;
+            }
+          }
+        }
+        document.documentElement.setAttribute("lang", lang);
+        window.__INITIAL_LANG__ = lang;
+        window.__INITIAL_THEME__ = theme;
+      } catch (e) {
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
+    })();
+  </script>
+
+  <!-- 5 distinct fonts (all Cyrillic + Latin): Unbounded, Pixelify Sans, JetBrains Mono, Rubik, Caveat -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&family=Pixelify+Sans:wght@500;700&family=Rubik:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Unbounded:wght@500;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Sticky Waybar / tmux-inspired top navigation -->
+  <header class="topbar" id="top">
+    <div class="container topbar-inner">
+      <a href="#top" class="brand" aria-label="dimasbotyara home">
+        <span class="brand-frog" aria-hidden="true">
+          <svg viewBox="0 0 16 16" shape-rendering="crispEdges" width="24" height="24">
+            <rect x="2" y="2" width="4" height="4" fill="var(--green)"/>
+            <rect x="10" y="2" width="4" height="4" fill="var(--green)"/>
+            <rect x="3" y="3" width="2" height="2" fill="var(--fg0)"/>
+            <rect x="11" y="3" width="2" height="2" fill="var(--fg0)"/>
+            <rect x="4" y="3" width="1" height="1" fill="var(--bg0-hard)"/>
+            <rect x="12" y="3" width="1" height="1" fill="var(--bg0-hard)"/>
+            <rect x="1" y="5" width="14" height="7" fill="var(--green)"/>
+            <rect x="2" y="12" width="12" height="2" fill="var(--green-dim)"/>
+            <rect x="2" y="8" width="2" height="1" fill="var(--red)"/>
+            <rect x="12" y="8" width="2" height="1" fill="var(--red)"/>
+            <rect x="5" y="9" width="6" height="1" fill="var(--bg0-hard)"/>
+            <rect x="4" y="8" width="1" height="1" fill="var(--bg0-hard)"/>
+            <rect x="11" y="8" width="1" height="1" fill="var(--bg0-hard)"/>
+          </svg>
+        </span>
+        <span class="brand-name">dimasbotyara</span>
+        <span class="brand-cursor" aria-hidden="true">_</span>
+      </a>
+
+      <nav class="nav-links" aria-label="sections">
+        <a href="#favorites" data-i18n="nav.favs">любимое</a>
+        <a href="#playable" data-i18n="nav.play">поиграть</a>
+        <a href="#shelf" data-i18n="nav.shelf">полка</a>
+        <a href="#about" data-i18n="nav.about">обо мне</a>
+        <a href="#stack" data-i18n="nav.stack">стек</a>
+      </nav>
+
+      <div class="topbar-controls">
+        <!-- Language Switcher -->
+        <div class="lang-switch" role="group" aria-label="Language switcher" id="langSwitch">
+          <button type="button" class="lang-btn" data-lang="ru" aria-pressed="true">ru</button>
+          <button type="button" class="lang-btn" data-lang="en" aria-pressed="false">en</button>
+        </div>
+
+        <!-- Theme Switcher (Gruvbox Dark / Light) -->
+        <button type="button" class="icon-btn theme-btn" id="themeToggle" aria-label="toggle gruvbox theme" title="toggle theme">
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2"></path><path d="M12 20v2"></path>
+            <path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path>
+            <path d="M2 12h2"></path><path d="M20 12h2"></path>
+            <path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path>
+          </svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+          </svg>
+          <span class="theme-label" id="themeLabel">dark</span>
+        </button>
+
+        <!-- GitHub shortcut -->
+        <a
+          href="https://github.com/dimasbotyara"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="icon-btn gh-btn"
+          aria-label="GitHub profile"
+          title="github.com/dimasbotyara"
+        >
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55 0-.27-.01-1.16-.02-2.11-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.25.45-2.28 1.19-3.08-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.8 1.19 1.83 1.19 3.08 0 4.41-2.69 5.38-5.26 5.67.42.36.79 1.07.79 2.16 0 1.56-.01 2.82-.01 3.2 0 .31.21.66.79.55A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Mobile scrollable quick nav -->
+    <nav class="mobile-nav" aria-label="mobile sections">
+      <a href="#favorites" data-i18n="nav.favs">любимое</a>
+      <a href="#playable" data-i18n="nav.play">поиграть</a>
+      <a href="#shelf" data-i18n="nav.shelf">полка</a>
+      <a href="#about" data-i18n="nav.about">обо мне</a>
+      <a href="#stack" data-i18n="nav.stack">стек</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- HERO SECTION -->
+    <section class="hero container">
+      <div class="hero-left">
+        <div class="hero-badges">
+          <span class="arch-pill">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" aria-hidden="true">
+              <path d="M12 1.8c-.9 2.2-1.5 3.7-2.6 5.8.7.7 1.5 1.5 2.8 2.4-1.4-.6-2.4-1.2-3.1-1.8C7.7 11 5.6 15.1 2 22c3-1.7 5.3-2.8 7.5-3.2-.1-.5-.2-1-.2-1.6v-.1c.1-1.9 1.1-3.4 2.4-3.3 1.2.1 2.2 1.7 2.1 3.6 0 .5-.1 1-.2 1.4 2.2.4 4.5 1.5 7.4 3.2-.6-1.1-1.1-2.1-1.6-3.1-.8-.6-1.6-1.4-3.3-2.3 1.1.3 2 .7 2.6 1-5-9.4-5.4-10.6-6.7-14.8Z"/>
+            </svg>
+            <span data-i18n="hero.badge">i use arch btw</span>
+          </span>
+          <span class="gruvbox-dots" aria-hidden="true" title="gruvbox palette">
+            <i style="background:var(--red)"></i>
+            <i style="background:var(--orange)"></i>
+            <i style="background:var(--yellow)"></i>
+            <i style="background:var(--green)"></i>
+            <i style="background:var(--aqua)"></i>
+            <i style="background:var(--blue)"></i>
+            <i style="background:var(--purple)"></i>
+          </span>
+        </div>
+
+        <div class="hero-title-wrap">
+          <h1 class="hero-title" data-i18n="hero.greeting">привет, я димас ботяра.</h1>
+        </div>
+
+        <p class="hero-handle">
+          <span class="pixel-tag">@dimasbotyara</span>
+          <span class="handle-sep">·</span>
+          <span class="mono-dim">49 repos</span>
+          <span class="handle-sep">·</span>
+          <span class="mono-dim">ru / en</span>
+        </p>
+
+        <p class="hero-subtitle" data-i18n="hero.subtitle">
+          пилю игры на чистом pygame, self-hosted штуки без облаков и аккаунтов, консольные утилиты под линукс и всякие странные эксперименты — просто потому что по кайфу.
+        </p>
+
+        <div class="hero-actions">
+          <a href="https://github.com/dimasbotyara" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
+              <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55 0-.27-.01-1.16-.02-2.11-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.25.45-2.28 1.19-3.08-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.8 1.19 1.83 1.19 3.08 0 4.41-2.69 5.38-5.26 5.67.42.36.79 1.07.79 2.16 0 1.56-.01 2.82-.01 3.2 0 .31.21.66.79.55A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"/>
+            </svg>
+            <span data-i18n="hero.ctaGithub">мой github</span>
+          </a>
+          <a href="#favorites" class="btn btn-secondary">
+            <span data-i18n="hero.ctaFavs">любимые проекты</span>
+            <span aria-hidden="true">↓</span>
+          </a>
+          <a href="#playable" class="btn btn-ghost">
+            <span data-i18n="hero.ctaPlay">поиграть и потыкать</span>
+            <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+
+        <!-- Direct contacts: Telegram & Discord (both click-to-copy) -->
+        <div class="contacts-bar" aria-label="social contacts">
+          <span class="contacts-label" data-i18n="hero.contactsLabel">связаться:</span>
+
+          <button
+            type="button"
+            class="contact-chip contact-tg"
+            id="telegramCopyBtn"
+            title="нажми, чтобы скопировать юзернейм telegram"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" aria-hidden="true">
+              <path d="M21.9 4.2c.2-.8-.5-1.4-1.3-1.1L2.7 10c-.9.3-.8 1.6.1 1.9l4.5 1.4 1.7 5.3c.2.7 1.1.9 1.6.4l2.5-2.5 4.8 3.5c.7.5 1.7.1 1.9-.7l2.1-15.1ZM9.4 13.7l8.2-5.4-6.4 6.8-.3 2.8-1.2-3.9-.3-.3Z"/>
+            </svg>
+            <span>telegram</span>
+            <code id="telegramHandleLabel">@dimasbotyara</code>
+          </button>
+
+          <button
+            type="button"
+            class="contact-chip contact-dc"
+            id="discordCopyBtn"
+            title="нажми, чтобы скопировать ник в discord"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" aria-hidden="true">
+              <path d="M19.8 5.4A16.5 16.5 0 0 0 15.7 4c-.2.3-.4.8-.5 1.1a15.3 15.3 0 0 0-4.4 0c-.1-.3-.3-.8-.5-1.1a16.6 16.6 0 0 0-4.1 1.4C3.6 9.3 2.9 13.1 3.2 16.8a16.8 16.8 0 0 0 5 2.5c.4-.5.8-1.1 1.1-1.8-.6-.2-1.2-.5-1.7-.8.1-.1.3-.2.4-.3 3.3 1.5 6.9 1.5 10.2 0 .1.1.3.2.4.3-.6.3-1.1.6-1.7.8.3.7.7 1.3 1.1 1.8a16.7 16.7 0 0 0 5-2.5c.4-4.3-.7-8.1-3.2-11.4ZM9.4 14.5c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Zm5.2 0c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Z"/>
+            </svg>
+            <span>discord</span>
+            <code id="discordHandleLabel">@dimas888</code>
+          </button>
+        </div>
+
+        <ul class="vibe-list" id="vibeList" aria-label="vibes"></ul>
+      </div>
+
+      <!-- Interactive Fish Terminal + Tide Crab Habitat -->
+      <div class="hero-right">
+        <div class="terminal-window" aria-label="Interactive terminal">
+          <div class="terminal-bar">
+            <div class="term-dots" aria-hidden="true">
+              <span class="dot-r"></span>
+              <span class="dot-y"></span>
+              <span class="dot-g"></span>
+            </div>
+            <div class="term-title" data-i18n="terminal.title">fish 4.9.3 — dimasbotyara@archlinux</div>
+            <button type="button" class="term-clear-btn" id="termClear" title="clear">cls</button>
+          </div>
+
+          <div class="terminal-body" id="termOutput" role="log" aria-live="polite"></div>
+
+          <form class="terminal-input-row" id="termForm" autocomplete="off">
+            <span class="term-prompt" aria-hidden="true">❯</span>
+            <input
+              type="text"
+              id="termInput"
+              class="term-input"
+              spellcheck="false"
+              autocomplete="off"
+              autocapitalize="off"
+              aria-label="terminal command input"
+              data-i18n-placeholder="terminal.placeholder"
+              placeholder="введи команду... (help, fastfetch, touch grass)"
+            />
+          </form>
+
+          <div class="terminal-chips" id="termChips" aria-label="quick commands"></div>
+        </div>
+
+        <!-- Pixel Tide Crab (Приливной краб) straight from pygame-slide-survivors/wildlife.py -->
+        <div class="crab-habitat" id="crabHabitat">
+          <div class="crab-header">
+            <div class="crab-title-group">
+              <span class="crab-name" data-i18n="crab.name">приливной краб</span>
+              <a
+                href="https://github.com/dimasbotyara/pygame-slide-survivors"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="crab-source"
+                data-i18n="crab.from"
+              >из slide survivors</a>
+            </div>
+            <span class="crab-hint-tag" data-i18n="crab.hint">тыкни крабика</span>
+          </div>
+
+          <div class="crab-bubble-bar" id="crabBubbleBar" hidden>
+            <span class="crab-speech" id="crabSpeech" role="status" aria-live="polite"></span>
+          </div>
+
+          <div class="crab-stage" id="crabStage" role="button" tabindex="0" aria-label="Tide Crab">
+            <div class="crab-water" aria-hidden="true"></div>
+            <div class="crab-sand" aria-hidden="true"></div>
+            <div class="crab-actor" id="crabActor">
+              <svg
+                id="crabSvg"
+                class="crab-svg"
+                viewBox="0 0 11 9"
+                shape-rendering="crispEdges"
+                width="55"
+                height="45"
+                aria-hidden="true"
+              ></svg>
+              <span class="crab-shadow" aria-hidden="true"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAVORITE PROJECTS (6 CARDS: 5 FROM README + PYGAME-SLIDE-SURVIVORS) -->
+    <section class="section container" id="favorites">
+      <div class="section-head">
+        <div>
+          <p class="section-eyebrow" data-i18n="sections.favsEyebrow">// из моего readme (и не только)</p>
+          <h2 class="section-title" data-i18n="sections.favsTitle">любимые проекты</h2>
+        </div>
+        <p class="section-note" data-i18n="sections.favsNote">то, чем реально пользуюсь сам или к чему постоянно возвращаюсь</p>
+      </div>
+
+      <div class="favs-grid" id="favsGrid"></div>
+    </section>
+
+    <!-- PLAYABLE BROWSER GAME (ALCHEMY-MATCHER ONLY) + CALCULATOR -->
+    <section class="section container" id="playable">
+      <div class="section-head">
+        <div>
+          <p class="section-eyebrow" data-i18n="sections.playEyebrow">// браузерка + кое-что ещё</p>
+          <h2 class="section-title" data-i18n="sections.playTitle">поиграть и потыкать</h2>
+        </div>
+        <p class="section-note" data-i18n="sections.playNote">алхимия запускается прямо в браузере, а рядом лежит обычный калькулятор — мало ли пригодится</p>
+      </div>
+
+      <div class="playable-grid">
+        <div id="playableGrid" class="playable-game-slot"></div>
+
+        <!-- Retro Gruvbox Calculator -->
+        <div class="calc-card" id="calcWidget" aria-label="Calculator">
+          <div class="calc-head">
+            <div class="calc-title-row">
+              <span class="fav-icon-wrap accent-orange" style="color:var(--orange)" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                  <rect x="4" y="2" width="16" height="20" rx="2"></rect>
+                  <line x1="8" y1="6" x2="16" y2="6"></line>
+                  <circle cx="8.5" cy="11" r="1" fill="currentColor"></circle>
+                  <circle cx="12" cy="11" r="1" fill="currentColor"></circle>
+                  <circle cx="15.5" cy="11" r="1" fill="currentColor"></circle>
+                  <circle cx="8.5" cy="15" r="1" fill="currentColor"></circle>
+                  <circle cx="12" cy="15" r="1" fill="currentColor"></circle>
+                  <circle cx="15.5" cy="15" r="1" fill="currentColor"></circle>
+                  <line x1="8" y1="18.5" x2="16" y2="18.5"></line>
+                </svg>
+              </span>
+              <h3 class="calc-title" data-i18n="calc.title">калькулятор</h3>
+            </div>
+            <span class="calc-cap-badge" data-i18n="calc.badge">v1.0</span>
+          </div>
+
+          <div class="calc-screen" id="calcScreen">
+            <div class="calc-expr" id="calcExpr">&nbsp;</div>
+            <div class="calc-display" id="calcDisplay">0</div>
+            <div class="calc-status" id="calcStatus" data-i18n="calc.idleHint">просто калькулятор</div>
+          </div>
+
+          <div class="calc-keys" id="calcKeys">
+            <button type="button" class="calc-key key-fn" data-action="clear">C</button>
+            <button type="button" class="calc-key key-fn" data-action="back" aria-label="backspace">⌫</button>
+            <button type="button" class="calc-key key-fn" data-action="sign">±</button>
+            <button type="button" class="calc-key key-op" data-op="/">÷</button>
+
+            <button type="button" class="calc-key" data-digit="7">7</button>
+            <button type="button" class="calc-key" data-digit="8">8</button>
+            <button type="button" class="calc-key" data-digit="9">9</button>
+            <button type="button" class="calc-key key-op" data-op="*">×</button>
+
+            <button type="button" class="calc-key" data-digit="4">4</button>
+            <button type="button" class="calc-key" data-digit="5">5</button>
+            <button type="button" class="calc-key" data-digit="6">6</button>
+            <button type="button" class="calc-key key-op" data-op="-">−</button>
+
+            <button type="button" class="calc-key" data-digit="1">1</button>
+            <button type="button" class="calc-key" data-digit="2">2</button>
+            <button type="button" class="calc-key" data-digit="3">3</button>
+            <button type="button" class="calc-key key-op" data-op="+">+</button>
+
+            <button type="button" class="calc-key key-zero" data-digit="0">0</button>
+            <button type="button" class="calc-key" data-action="dot">.</button>
+            <button type="button" class="calc-key key-eq" data-action="eq">=</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJECT SHELF (FILTERABLE + SEARCH + RANDOM ROLLER) -->
+    <section class="section container" id="shelf">
+      <div class="section-head">
+        <div>
+          <p class="section-eyebrow" data-i18n="sections.shelfEyebrow">// 49 репо и не останавливаюсь</p>
+          <h2 class="section-title" data-i18n="sections.shelfTitle">полка со всяким разным</h2>
+        </div>
+        <p class="section-note" data-i18n="sections.shelfNote">от rts и поддельного казино до языка программирования про пчёл</p>
+      </div>
+
+      <div class="shelf-toolbar">
+        <div class="filter-pills" id="filterPills" role="tablist" aria-label="project categories"></div>
+
+        <div class="shelf-actions">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true">
+              <circle cx="11" cy="11" r="7"></circle>
+              <path d="m20 20-3.5-3.5"></path>
+            </svg>
+            <input
+              type="search"
+              id="shelfSearch"
+              data-i18n-placeholder="sections.searchPlaceholder"
+              placeholder="поиск по названию, описанию, стеку..."
+              aria-label="search projects"
+            />
+          </div>
+          <button type="button" class="btn btn-random" id="randomRepoBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="3"></rect>
+              <circle cx="8.5" cy="8.5" r="1.2" fill="currentColor"></circle>
+              <circle cx="15.5" cy="8.5" r="1.2" fill="currentColor"></circle>
+              <circle cx="12" cy="12" r="1.2" fill="currentColor"></circle>
+              <circle cx="8.5" cy="15.5" r="1.2" fill="currentColor"></circle>
+              <circle cx="15.5" cy="15.5" r="1.2" fill="currentColor"></circle>
+            </svg>
+            <span data-i18n="sections.randomBtn">рандомный репо</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Random roll banner (hidden until rolled) -->
+      <div class="random-banner" id="randomBanner" hidden></div>
+
+      <div class="shelf-grid" id="shelfGrid"></div>
+
+      <div class="shelf-footer">
+        <a href="https://github.com/dimasbotyara?tab=repositories" target="_blank" rel="noopener noreferrer" class="all-repos-link">
+          <span data-i18n="sections.allReposLink">смотреть все 49 репозиториев на github</span>
+          <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- ABOUT: HOW I CODE & HARDWARE/VIBE -->
+    <section class="section container" id="about">
+      <div class="section-head">
+        <div>
+          <p class="section-eyebrow" data-i18n="sections.aboutEyebrow">// честно и без воды</p>
+          <h2 class="section-title" data-i18n="sections.aboutTitle">как я пишу код и на чём сижу</h2>
+        </div>
+      </div>
+
+      <div class="about-grid">
+        <article class="about-card about-card-ai">
+          <div class="about-card-head">
+            <span class="about-icon accent-purple" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+                <rect x="3" y="7" width="18" height="12" rx="3"></rect>
+                <path d="M12 3v4"></path>
+                <circle cx="9" cy="13" r="1.3" fill="currentColor"></circle>
+                <circle cx="15" cy="13" r="1.3" fill="currentColor"></circle>
+                <path d="M9 16.5h6"></path>
+              </svg>
+            </span>
+            <h3 data-i18n="about.aiTitle">как я пишу код</h3>
+            <span class="hand-note about-doodle" data-i18n="about.aiDoodle">diff сам себя не прочитает</span>
+          </div>
+          <p data-i18n="about.aiText1"></p>
+          <p data-i18n="about.aiText2"></p>
+          <p class="ai-small-note" data-i18n="about.aiConfession">так я оправдываю своё неумение писать код</p>
+          <div class="about-pills">
+            <span class="mini-pill" data-i18n="about.aiPill1"></span>
+            <span class="mini-pill" data-i18n="about.aiPill2"></span>
+            <span class="mini-pill" data-i18n="about.aiPill3"></span>
+          </div>
+        </article>
+
+        <article class="about-card about-card-hw">
+          <div class="about-card-head">
+            <span class="about-icon accent-aqua" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+                <rect x="3" y="4" width="18" height="12" rx="2"></rect>
+                <path d="M2 20h20"></path>
+                <path d="M8 16v4"></path>
+                <path d="M16 16v4"></path>
+              </svg>
+            </span>
+            <h3 data-i18n="about.hwTitle">железо и философия</h3>
+            <span class="hand-note about-doodle" data-i18n="about.hwDoodle">да, батарея 0%, он живёт от розетки 😭</span>
+          </div>
+          <p data-i18n="about.hwText1"></p>
+          <p data-i18n="about.hwText2"></p>
+          <div class="hw-specs-box">
+            <span class="hw-specs-label" data-i18n="about.hwSpecLabel">слабый ноут из fastfetch:</span>
+            <div class="hw-specs-row">
+              <code>Arch Linux</code>
+              <code>HP Pavilion dv9700</code>
+              <code>Core 2 Duo T5850</code>
+              <code>GeForce 8600M GS</code>
+              <code>3.83 GiB RAM</code>
+              <code>Battery: 0% [AC]</code>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- STACK & TOOLS -->
+    <section class="section container" id="stack">
+      <div class="section-head">
+        <div>
+          <p class="section-eyebrow" data-i18n="sections.stackEyebrow">// мой зоопарк инструментов</p>
+          <h2 class="section-title" data-i18n="sections.stackTitle">стек и игрушки</h2>
+        </div>
+        <p class="section-note" data-i18n="sections.stackNote">никаких полосок «python 92%» — просто то, чем реально пользуюсь</p>
+      </div>
+
+      <div class="stack-groups" id="stackGroups"></div>
+    </section>
+  </main>
+
+  <!-- TMUX / GRUVBOX STATUSLINE FOOTER -->
+  <footer class="footer">
+    <div class="gruvbox-strip" aria-hidden="true">
+      <span style="background:var(--red)"></span>
+      <span style="background:var(--orange)"></span>
+      <span style="background:var(--yellow)"></span>
+      <span style="background:var(--green)"></span>
+      <span style="background:var(--aqua)"></span>
+      <span style="background:var(--blue)"></span>
+      <span style="background:var(--purple)"></span>
+    </div>
+    <div class="container footer-inner">
+      <div class="footer-left">
+        <span class="footer-wordmark">dimasbotyara</span>
+        <span class="footer-made" data-i18n="footer.madeWith">сделано с 💜 и любовью к gruvbox</span>
+      </div>
+
+      <div class="footer-mid">
+        <span class="kbd-hint" data-i18n="footer.shortcuts">[t] тема · [l] язык · [/] поиск</span>
+      </div>
+
+      <div class="footer-links">
+        <a href="https://github.com/dimasbotyara" target="_blank" rel="noopener noreferrer" data-i18n="footer.links.github">github</a>
+        <button type="button" class="footer-copy-link" id="footerTelegramBtn" data-i18n="footer.links.telegram">telegram: @dimasbotyara</button>
+        <button type="button" class="footer-copy-link" id="footerDiscordBtn" data-i18n="footer.links.discord">discord: @dimas888</button>
+        <a href="https://github.com/dimasbotyara/dimasbotyara" target="_blank" rel="noopener noreferrer" data-i18n="footer.links.readme">readme</a>
+        <a href="https://github.com/dimasbotyara?tab=repositories" target="_blank" rel="noopener noreferrer" data-i18n="footer.links.repos">все репо</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

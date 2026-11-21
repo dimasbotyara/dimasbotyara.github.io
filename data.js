@@ -1,0 +1,907 @@
+// all data & bilingual copy for dimasbotyara.github.io
+// gruvbox & vibes
+
+const SITE_DATA = {
+  githubUser: "dimasbotyara",
+  githubUrl: "https://github.com/dimasbotyara",
+  readmeUrl: "https://github.com/dimasbotyara/dimasbotyara",
+  reposUrl: "https://github.com/dimasbotyara?tab=repositories",
+  telegramHandle: "@dimasbotyara",
+  telegramCopyValue: "@dimasbotyara",
+  discordHandle: "@dimas888",
+  discordCopyValue: "dimas888",
+  totalRepos: 49,
+
+  // Exact pixel data & palette from dimasbotyara/pygame-slide-survivors (wildlife.py -> tide_crab)
+  tideCrab: {
+    baseColor: [223, 152, 116],       // 1: body (#df9874)
+    highlightColor: [255, 192, 156],  // 2: body + 40 clamped (#ffc09c)
+    eyeColor: [255, 237, 121],        // 3: eye (#ffed79)
+    darkColor: [44, 35, 55],          // 4: dark marking (#2c2337)
+    pixels: [
+      "1.2...2.1",
+      "222...222",
+      ".1.3.3.1.",
+      "..11111..",
+      ".1222221.",
+      "114111411",
+      "11.....11"
+    ]
+  },
+
+  i18n: {
+    ru: {
+      pageTitle: "dimasbotyara — просто визитка",
+      metaDesc: "привет, я димас ботяра. делаю игры на pygame, self-hosted штуки для локалки и утилиты под линукс. gruvbox внутри.",
+      nav: {
+        favs: "любимое",
+        play: "поиграть",
+        shelf: "полка",
+        about: "обо мне",
+        stack: "стек"
+      },
+      themeTooltip: "сменить тему (клавиша T)",
+      langTooltip: "сменить язык (клавиша L)",
+      hero: {
+        badge: "i use arch btw",
+        greeting: "привет, я димас ботяра.",
+        subtitle: "пилю игры на чистом pygame, self-hosted штуки без облаков и аккаунтов, консольные утилиты под линукс и всякие странные эксперименты — просто потому что по кайфу.",
+        ctaGithub: "мой github",
+        ctaFavs: "любимые проекты",
+        ctaPlay: "поиграть и потыкать",
+        contactsLabel: "связаться:",
+        copied: "скопировано! ✓",
+        telegramTooltip: "нажми, чтобы скопировать юзернейм telegram",
+        discordTooltip: "нажми, чтобы скопировать ник в discord",
+        vibes: [
+          "local-first",
+          "без облака и логинов",
+          "чистый python / pygame",
+          "любитель gruvbox",
+          "cachyos + arch на старом ноуте"
+        ]
+      },
+      crab: {
+        name: "приливной краб",
+        from: "из slide survivors",
+        hint: "тыкни крабика",
+        quotes: [
+          "димас ботяра считает меня очаровашкой, но вообще-то я могу и цапнуть на 10 урона...",
+          "я приливной краб из pygame-slide-survivors, между прочим!",
+          "клац-клац 🦀",
+          "🦀",
+          "у меня 50 hp и радиус удара 46 пикселей. имей в виду.",
+          "не трогай траву, трогай тёплый песок",
+          "🐚",
+          "меня нарисовали в 9×7 пикселей в wildlife.py — и мне норм!",
+          "i use arch btw 🦀",
+          "👀",
+          "я бы убежал на берег, но тут в gruvbox слишком уютно",
+          "тыкнешь ещё раз — сделаю замах 0.32 сек...",
+          "🌊",
+          "мой любимый цвет — rgb(223, 152, 116)",
+          "сижу тут, чиллю, никого не трогаю (пока)",
+          "🥺",
+          "бульк... ой, это прилив",
+          "✨",
+          "передаю привет старому hp pavilion на core 2 duo!",
+          "хожу боком, потому что могу"
+        ]
+      },
+      terminal: {
+        title: "fish 4.9.3 — dimasbotyara@archlinux",
+        hint: "тыкай по кнопкам или введи команду (help — список)",
+        placeholder: "введи команду... (help, fastfetch, touch grass)",
+        chips: [
+          { cmd: "touch grass", label: "touch grass" },
+          { cmd: "fastfetch", label: "fastfetch" },
+          { cmd: "whoami", label: "whoami" },
+          { cmd: "contacts", label: "contacts" },
+          { cmd: "crab", label: "🦀 crab" }
+        ]
+      },
+      sections: {
+        favsEyebrow: "// из моего readme (и не только)",
+        favsTitle: "любимые проекты",
+        favsNote: "то, чем реально пользуюсь сам или к чему постоянно возвращаюсь",
+        playEyebrow: "// браузерка + кое-что ещё",
+        playTitle: "поиграть и потыкать",
+        playNote: "алхимия запускается прямо в браузере, а рядом лежит обычный калькулятор — мало ли пригодится",
+        playBtn: "запустить",
+        codeBtn: "код",
+        openRepo: "репозиторий",
+        shelfEyebrow: "// 49 репо и не останавливаюсь",
+        shelfTitle: "полка со всяким разным",
+        shelfNote: "от rts и поддельного казино до языка программирования про пчёл",
+        searchPlaceholder: "поиск по названию, описанию, стеку...",
+        randomBtn: "рандомный репо",
+        randomPicked: "выпало вот это:",
+        emptySearch: "ничего не нашлось... попробуй другое слово или жми рандом :)",
+        allReposLink: "смотреть все 49 репозиториев на github",
+        aboutEyebrow: "// честно и без воды",
+        aboutTitle: "как я пишу код и на чём сижу",
+        stackEyebrow: "// мой зоопарк инструментов",
+        stackTitle: "стек и игрушки",
+        stackNote: "никаких полосок «python 92%» — просто то, чем реально пользуюсь"
+      },
+      calc: {
+        title: "калькулятор",
+        badge: "v1.0",
+        idleHint: "просто калькулятор",
+        divZero: "на ноль делить не буду 🤨",
+        over77: [
+          "ответов не будет 🤭",
+          "больше 77 — считай сам 🤫",
+          "ой, это больше 77... я молчу 🤐",
+          "слишком много (> 77), ответов нет 🙅"
+        ]
+      },
+      categories: {
+        all: "все",
+        games: "игры",
+        selfhosted: "self-hosted / lan",
+        linux: "linux & cli",
+        weird: "угар и разное"
+      },
+      about: {
+        aiTitle: "как я пишу код",
+        aiDoodle: "diff сам себя не прочитает",
+        aiText1: "я пишу код вместе с нейронками, но реально читаю каждый diff. часто трачу больше времени на промпты, архитектуру и ревью, чем если бы стучал по клавишам вручную.",
+        aiText2: "ии — это инструмент, а что именно пойдёт в релиз и как оно будет работать — решаю я.",
+        aiConfession: "так я оправдываю своё неумение писать код",
+        aiPill1: "читаю каждый diff",
+        aiPill2: "zero engine bloat",
+        aiPill3: "делаю для себя и друзей",
+        hwTitle: "железо и философия",
+        hwDoodle: "да, батарея 0%, он живёт от розетки 😭",
+        hwText1: "на основном пк — cachyos, а рядом трудится легендарный hp pavilion dv9700 на arch linux: core 2 duo t5850, geforce 8600m gs и 3.83 гига оперативки.",
+        hwText2: "именно из-за любви к лёгкому софту мои штуки стараются не жрать лишнего, работать оффлайн в локальной сети, без телеметрии, облаков и регистраций — и почти везде есть темы (gruvbox обязательно).",
+        hwSpecLabel: "слабый ноут из fastfetch:"
+      },
+      stackGroups: [
+        {
+          id: "langs",
+          title: "языки",
+          accent: "yellow",
+          items: [
+            { name: "python", icon: "python" },
+            { name: "javascript", icon: "js" },
+            { name: "bash / fish", icon: "terminal" },
+            { name: "html & css", icon: "code" },
+            { name: "c++17", icon: "cpp" },
+            { name: "rust (tauri)", icon: "rust" },
+            { name: "markdown", icon: "doc" }
+          ]
+        },
+        {
+          id: "libs",
+          title: "движки и библиотеки",
+          accent: "aqua",
+          items: [
+            { name: "pygame / pygame-ce", icon: "gamepad" },
+            { name: "flask + socket.io", icon: "server" },
+            { name: "pyqt5 / pyqt6", icon: "window" },
+            { name: "sqlite", icon: "db" },
+            { name: "pytorch", icon: "spark" },
+            { name: "godot", icon: "cube" },
+            { name: "rich tui", icon: "palette" }
+          ]
+        },
+        {
+          id: "env",
+          title: "система и быт",
+          accent: "green",
+          items: [
+            { name: "arch linux", icon: "arch" },
+            { name: "cachyos", icon: "linux" },
+            { name: "git & github", icon: "git" },
+            { name: "pycharm", icon: "ide" },
+            { name: "obsidian", icon: "note" },
+            { name: "pipewire & ffmpeg", icon: "audio" },
+            { name: "discord", icon: "chat" }
+          ]
+        }
+      ],
+      footer: {
+        madeWith: "сделано с 💜 и любовью к gruvbox",
+        shortcuts: "[t] тема · [l] язык · [/] поиск",
+        links: {
+          github: "github",
+          telegram: "telegram: @dimasbotyara",
+          discord: "discord: @dimas888",
+          readme: "readme",
+          repos: "все репо"
+        }
+      },
+      favBadgeDaily: "юзаю каждый день",
+      favBadgeBack: "постоянно допиливаю",
+      favBadgeGame: "любимый рогалик",
+      desktopClientNote: "+ десктоп-клиент на tauri/rust",
+      siteCardNote: "визитка игры"
+    },
+
+    en: {
+      pageTitle: "dimasbotyara — just a personal page",
+      metaDesc: "hey, i'm dimasbotyara. i build pure pygame games, local-first self-hosted LAN apps, and linux cli tools. gruvbox inside.",
+      nav: {
+        favs: "favorites",
+        play: "play",
+        shelf: "shelf",
+        about: "about",
+        stack: "stack"
+      },
+      themeTooltip: "toggle theme (press T)",
+      langTooltip: "switch language (press L)",
+      hero: {
+        badge: "i use arch btw",
+        greeting: "hey, i'm dimasbotyara.",
+        subtitle: "i build pure pygame games, self-hosted LAN apps with zero cloud or accounts, lightweight linux tools, and weird little experiments — mostly just for fun.",
+        ctaGithub: "my github",
+        ctaFavs: "favorite stuff",
+        ctaPlay: "play & mess around",
+        contactsLabel: "find me:",
+        copied: "copied! ✓",
+        telegramTooltip: "click to copy telegram handle",
+        discordTooltip: "click to copy discord handle",
+        vibes: [
+          "local-first",
+          "no cloud, no accounts",
+          "pure python / pygame",
+          "gruvbox enjoyer",
+          "cachyos + arch on a potato laptop"
+        ]
+      },
+      crab: {
+        name: "tide crab",
+        from: "from slide survivors",
+        hint: "boop the crab",
+        quotes: [
+          "dimasbotyara thinks i'm a cutie, but i can totally pinch for 10 damage...",
+          "i'm the tide crab straight outta pygame-slide-survivors, btw!",
+          "snip-snip 🦀",
+          "🦀",
+          "50 hp and a 46px strike radius. just saying.",
+          "don't touch grass, touch warm sand",
+          "🐚",
+          "9×7 pixels of pure charm from wildlife.py",
+          "i use arch btw 🦀",
+          "👀",
+          "would crawl back to the coast, but gruvbox is way too cozy",
+          "boop me one more time and i'll do my 0.32s windup...",
+          "🌊",
+          "favorite color: rgb(223, 152, 116)",
+          "just vibing here, pinching nobody (yet)",
+          "🥺",
+          "bloop... oh, that's the tide",
+          "✨",
+          "shoutout to the legendary core 2 duo hp pavilion!",
+          "walking sideways because i can"
+        ]
+      },
+      terminal: {
+        title: "fish 4.9.3 — dimasbotyara@archlinux",
+        hint: "click a button or type a command (try help)",
+        placeholder: "type a command... (help, fastfetch, touch grass)",
+        chips: [
+          { cmd: "touch grass", label: "touch grass" },
+          { cmd: "fastfetch", label: "fastfetch" },
+          { cmd: "whoami", label: "whoami" },
+          { cmd: "contacts", label: "contacts" },
+          { cmd: "crab", label: "🦀 crab" }
+        ]
+      },
+      sections: {
+        favsEyebrow: "// straight from my readme (& more)",
+        favsTitle: "favorite stuff i built",
+        favsNote: "things i actually use every day or keep coming back to",
+        playEyebrow: "// browser game + extra",
+        playTitle: "play & mess around",
+        playNote: "alchemy runs right in your browser, plus there's a totally normal calculator next to it",
+        playBtn: "play now",
+        codeBtn: "source",
+        openRepo: "repo",
+        shelfEyebrow: "// 49 repos and counting",
+        shelfTitle: "the project shelf",
+        shelfNote: "from a pure-python RTS and fake casino to a bee-themed programming language",
+        searchPlaceholder: "filter by name, vibe, stack...",
+        randomBtn: "roll random repo",
+        randomPicked: "you rolled:",
+        emptySearch: "nothing matched... try another word or hit random :)",
+        allReposLink: "browse all 49 repositories on github",
+        aboutEyebrow: "// honest & zero fluff",
+        aboutTitle: "how i code & what runs it",
+        stackEyebrow: "// my box of tools",
+        stackTitle: "stack & toys",
+        stackNote: "no fake 'python 92%' skill bars — just stuff i genuinely use"
+      },
+      calc: {
+        title: "calculator",
+        badge: "v1.0",
+        idleHint: "just a calculator",
+        divZero: "not dividing by zero today 🤨",
+        over77: [
+          "no answers above 77 🤭",
+          "over 77 — figure it out yourself 🤫",
+          "uh oh, that's over 77... staying quiet 🤐",
+          "too big (> 77), no answers for you 🙅"
+        ]
+      },
+      categories: {
+        all: "all",
+        games: "games",
+        selfhosted: "self-hosted / lan",
+        linux: "linux & cli",
+        weird: "fun & weird"
+      },
+      about: {
+        aiTitle: "how i code",
+        aiDoodle: "diffs don't read themselves",
+        aiText1: "i write code with ai, but i actually read every single diff. i often spend more time on prompts and review than i would typing it all by hand.",
+        aiText2: "the ai is the tool — i'm the one deciding what actually ships.",
+        aiConfession: "that's how i justify not knowing how to code",
+        aiPill1: "read every diff",
+        aiPill2: "zero engine bloat",
+        aiPill3: "built for myself & friends",
+        hwTitle: "hardware & philosophy",
+        hwDoodle: "yes, battery is 0%, it lives on AC 😭",
+        hwText1: "daily driving cachyos on my main rig, plus my immortal hp pavilion dv9700 running arch linux: core 2 duo t5850, geforce 8600m gs, and 3.83 GiB of RAM.",
+        hwText2: "that's why my tools stay lightweight, offline-first, self-hosted over LAN, with zero telemetry or logins — and almost everything comes with themes (gruvbox included).",
+        hwSpecLabel: "the weak pc from fastfetch:"
+      },
+      stackGroups: [
+        {
+          id: "langs",
+          title: "languages",
+          accent: "yellow",
+          items: [
+            { name: "python", icon: "python" },
+            { name: "javascript", icon: "js" },
+            { name: "bash / fish", icon: "terminal" },
+            { name: "html & css", icon: "code" },
+            { name: "c++17", icon: "cpp" },
+            { name: "rust (tauri)", icon: "rust" },
+            { name: "markdown", icon: "doc" }
+          ]
+        },
+        {
+          id: "libs",
+          title: "engines & libs",
+          accent: "aqua",
+          items: [
+            { name: "pygame / pygame-ce", icon: "gamepad" },
+            { name: "flask + socket.io", icon: "server" },
+            { name: "pyqt5 / pyqt6", icon: "window" },
+            { name: "sqlite", icon: "db" },
+            { name: "pytorch", icon: "spark" },
+            { name: "godot", icon: "cube" },
+            { name: "rich tui", icon: "palette" }
+          ]
+        },
+        {
+          id: "env",
+          title: "os & daily gear",
+          accent: "green",
+          items: [
+            { name: "arch linux", icon: "arch" },
+            { name: "cachyos", icon: "linux" },
+            { name: "git & github", icon: "git" },
+            { name: "pycharm", icon: "ide" },
+            { name: "obsidian", icon: "note" },
+            { name: "pipewire & ffmpeg", icon: "audio" },
+            { name: "discord", icon: "chat" }
+          ]
+        }
+      ],
+      footer: {
+        madeWith: "made with 💜 and gruvbox",
+        shortcuts: "[t] theme · [l] lang · [/] search",
+        links: {
+          github: "github",
+          telegram: "telegram: @dimasbotyara",
+          discord: "discord: @dimas888",
+          readme: "readme",
+          repos: "all repos"
+        }
+      },
+      favBadgeDaily: "daily driver",
+      favBadgeBack: "keep coming back to",
+      favBadgeGame: "fav roguelike",
+      desktopClientNote: "+ tauri/rust desktop client",
+      siteCardNote: "game showcase page"
+    }
+  },
+
+  favorites: [
+    {
+      name: "botyaranewtab",
+      url: "https://github.com/dimasbotyara/botyaranewtab",
+      lang: "Python / JS",
+      accent: "yellow",
+      icon: "tab",
+      badgeKey: "favBadgeDaily",
+      tags: ["local-first", "15+ themes", "bangs & calc", "zero cloud"],
+      desc: {
+        ru: "кастомная страница новой вкладки, которой я пользуюсь буквально каждый день. 15+ тем, свои шрифты, движок обоев, умный поиск с bang-командами и калькулятором прямо в строке, виджеты и папки.",
+        en: "local-first customizable new tab page i use every single day. 15+ themes, custom fonts, wallpaper engine, smart search with bang commands & inline calculator, widgets, shortcuts and folders."
+      }
+    },
+    {
+      name: "botyaratalk",
+      url: "https://github.com/dimasbotyara/botyaratalk",
+      extraUrl: "https://github.com/dimasbotyara/botyaratalk-desktop",
+      extraLabelKey: "desktopClientNote",
+      lang: "JS / Flask",
+      accent: "aqua",
+      icon: "chat",
+      badgeKey: "favBadgeBack",
+      tags: ["LAN", "voice & video", "RNNoise", "10 themes"],
+      desc: {
+        ru: "мессенджер для локальной сети, к которому я постоянно возвращаюсь. текстовые каналы, голосовые звонки, видео и демка экрана со звуком системы, локальное шумоподавление RNNoise и 10 тем.",
+        en: "self-hosted LAN messenger i keep coming back to. text channels, voice calls, video & screen sharing with system audio, local RNNoise noise suppression, 10 themes, sqlite storage — zero cloud."
+      }
+    },
+    {
+      name: "pygame-slide-survivors",
+      url: "https://github.com/dimasbotyara/pygame-slide-survivors",
+      extraUrl: "https://dimasbotyara.github.io/pygame-slide-survivors/",
+      extraLabelKey: "siteCardNote",
+      lang: "Python",
+      accent: "red",
+      icon: "sword",
+      badgeKey: "favBadgeGame",
+      tags: ["roguelike", "survivors", "pygame", "tide crab 🦀"],
+      desc: {
+        ru: "аренный рогалик в духе vampire survivors на чистом pygame — герои, биомы (включая милейшего приливного краба 🦀), толпы врагов, предметы, ачивки, частицы и локальные рекорды.",
+        en: "survivors-style arena roguelike built on pure pygame — heroes, biomes (featuring the adorable tide crab 🦀), enemy hordes, items, achievements, particles, and local highscores."
+      }
+    },
+    {
+      name: "botyarapong",
+      url: "https://github.com/dimasbotyara/botyarapong",
+      lang: "Python",
+      accent: "orange",
+      icon: "pong",
+      tags: ["28 power-ups", "LAN", "pygame", "chaos"],
+      desc: {
+        ru: "классический понг на стероидах: 28 паверапов, 3 сложности бота, локальный мультиплеер с автопоиском, частицы, тряска экрана и ui на nerd font. чистый pygame и хаос.",
+        en: "classic pong on steroids — 28 power-ups, 3 ai difficulties, LAN multiplayer with auto-discovery, particles, screen shake, nerd font ui. pure pygame, zero engine bloat, pure chaos."
+      }
+    },
+    {
+      name: "botyaracloud",
+      url: "https://github.com/dimasbotyara/botyaracloud",
+      lang: "JS / Flask",
+      accent: "blue",
+      icon: "cloud",
+      tags: ["LAN", "live viewer", "8 themes", "self-hosted"],
+      desc: {
+        ru: "локальный файловый сервер — как `python -m http.server`, только на стероидах и реально приятный. кинул файл в папку — все сразу видят. встроенный просмотр фото, видео, аудио, pdf и кода.",
+        en: "self-hosted LAN file server — like `python -m http.server`, except actually pleasant to use. drop files in a folder and everyone sees them live, with built-in viewers for media, pdf & code."
+      }
+    },
+    {
+      name: "botyarajump",
+      url: "https://github.com/dimasbotyara/botyarajump",
+      lang: "Python",
+      accent: "green",
+      icon: "jump",
+      tags: ["platformer", "level editor", "quests", "pygame-ce"],
+      desc: {
+        ru: "платформер в духе doodle jump на pygame-ce: бесконечные режимы от лавы до зеркального мира, скины реально меняющие геймплей, ежедневные квесты, сюжетка и встроенный редактор уровней.",
+        en: "juice-loaded doodle jump-style platformer on pygame-ce — endless modes from lava to mirror world, skins that actually change gameplay, daily quests, story campaign, and a built-in level editor."
+      }
+    }
+  ],
+
+  playable: [
+    {
+      name: "alchemy-matcher",
+      liveUrl: "https://dimasbotyara.github.io/alchemy-matcher/",
+      repoUrl: "https://github.com/dimasbotyara/alchemy-matcher",
+      accent: "purple",
+      icon: "flask",
+      tags: ["582 items", "dark / light", "RU / EN", "vanilla js", "no signup"],
+      desc: {
+        ru: "единственная браузерная игра — уютная головоломка-алхимия: скрафти 582 элемента из 4 базовых. без установок и регистраций, прогресс хранится прямо в браузере, есть светлая и тёмная темы, русский и английский.",
+        en: "the one and only browser game here — a cozy element-combining puzzle where you craft 582 items from 4 basics. zero installs, zero signups, progress stays in your browser, dark/light themes, EN/RU."
+      }
+    }
+  ],
+
+  shelf: [
+    // GAMES
+    {
+      name: "botyaraRTS",
+      url: "https://github.com/dimasbotyara/botyaraRTS",
+      cat: "games",
+      lang: "Python",
+      tags: ["pygame", "rts", "~10k lines"],
+      desc: {
+        ru: "sci-fi rts с нуля на pygame: туман войны, a* поиск пути, 30 карточек технологий, миникарта, наземные и воздушные юниты. ~10к строк без движка.",
+        en: "sci-fi rts from scratch in pure pygame: fog of war, a* pathfinding, 30 roguelike tech cards, minimap, land & air units. ~10k lines, zero engine bloat."
+      }
+    },
+    {
+      name: "botyaraclick",
+      url: "https://github.com/dimasbotyara/botyaraclick",
+      cat: "games",
+      lang: "Python",
+      tags: ["clicker", "176 upgrades", "13 themes"],
+      desc: {
+        ru: "от гаража до галактики — огромный кликер на pygame: 176 апгрейдов, 50 ачивок, 7 эпох, престиж, 13 анимированных тем и ~17к строк питона.",
+        en: "from garage to galaxy — full-featured pygame idle/clicker with 176 upgrades, 50 achievements, 7 eras, prestige, 13 animated themes, ~17k lines."
+      }
+    },
+    {
+      name: "botyaraTD",
+      url: "https://github.com/dimasbotyara/botyaraTD",
+      cat: "games",
+      lang: "Python",
+      tags: ["tower-defense", "pygame", "RU/EN"],
+      desc: {
+        ru: "сочный tower defense на pygame: 8 башен × 3 апгрейда, 25 волн, 3 суперспособности, взрывы из частиц и процедурный звук.",
+        en: "juicy tower defense on pygame: 8 towers × 3 upgrades, 25 waves, 3 super abilities, particle explosions, screen shake, and procedural audio."
+      }
+    },
+    {
+      name: "gearworks-industrial-age",
+      url: "https://github.com/dimasbotyara/gearworks-industrial-age",
+      cat: "games",
+      lang: "Python",
+      tags: ["factorio-like", "automation", "pygame"],
+      desc: {
+        ru: "игра про автоматизацию заводов в духе factorio на чистом pygame — здания, производственные цепочки и сохранения.",
+        en: "factory automation game inspired by factorio on pure pygame — buildings, production chains, entity systems, and saves."
+      }
+    },
+    {
+      name: "botyaradarts",
+      url: "https://github.com/dimasbotyara/botyaradarts",
+      cat: "games",
+      lang: "Python",
+      tags: ["tv-friendly", "501 & cricket", "pygame"],
+      desc: {
+        ru: "табло для дартса под телек: тыкаешь по мишени вместо ввода цифр. 6 режимов, 42 апгрейда с рулеткой, конфетти и лидерборды.",
+        en: "tv-friendly darts scoreboard on pygame — click the board instead of typing scores. 6 modes, 42 upgrades, cricket & 501, confetti & stats."
+      }
+    },
+    {
+      name: "botyaracities-ru",
+      url: "https://github.com/dimasbotyara/botyaracities-ru",
+      cat: "games",
+      lang: "Python",
+      tags: ["LAN", "word-game", "pygame"],
+      desc: {
+        ru: "«города россии» по локалке вдвоём: база ~400 городов, 3 жизни, таймер, частицы и бонусная cli-искалка с нечётким поиском.",
+        en: "lan multiplayer 'cities of russia' word game — ~400 city database, 3 lives, timer, particles, pygame client + tcp server."
+      }
+    },
+    {
+      name: "pygame-arkanoid",
+      url: "https://github.com/dimasbotyara/pygame-arkanoid",
+      cat: "games",
+      lang: "Python",
+      tags: ["cyberpunk", "breakout", "pygame-ce"],
+      desc: {
+        ru: "киберпанк-арканоид с подкруткой мяча, процедурным синтезом звука, 8 паверапами и 7 видами блоков.",
+        en: "cyberpunk breakout on pygame-ce — neon visuals, spin physics, procedural audio synthesis, 8 power-ups, and 7 brick types."
+      }
+    },
+    {
+      name: "botyaragames",
+      url: "https://github.com/dimasbotyara/botyaragames",
+      cat: "games",
+      lang: "Python",
+      tags: ["minigames", "LAN", "tcp"],
+      desc: {
+        ru: "сборник мини-игр (4 в ряд, понг, реакция, крестики-нолики) с ботом или по локалке через плагинный реестр.",
+        en: "pygame mini-game pack (connect four, pong, reaction, tic-tac-toe) — play locally, vs bot, or over LAN via pluggable registry."
+      }
+    },
+
+    // SELF-HOSTED / LAN
+    {
+      name: "botyarachess",
+      url: "https://github.com/dimasbotyara/botyarachess",
+      cat: "selfhosted",
+      lang: "JavaScript",
+      tags: ["chess", "LLM & stockfish", "20 themes"],
+      desc: {
+        ru: "оффлайн-шахматы в браузере: flask + stockfish + llm-соперники, с которыми можно переписываться, онлайн-партии с часами, elo и 20 тем.",
+        en: "offline-first chess web app: flask + stockfish + chat-capable llm opponents (openai/claude/gemini/lm studio), clocks, elo & 20 themes."
+      }
+    },
+    {
+      name: "botyarawatch",
+      url: "https://github.com/dimasbotyara/botyarawatch",
+      cat: "selfhosted",
+      lang: "JavaScript",
+      tags: ["watch-party", "socket.io", "flask"],
+      desc: {
+        ru: "совместный просмотр видео с синхронизацией: общий плейлист, голосование за следующий ролик, чат и встроенная скачка.",
+        en: "self-hosted watch-party app: synced playback, shared playlist, voting for next video, chat, and built-in downloading."
+      }
+    },
+    {
+      name: "botyaratools",
+      url: "https://github.com/dimasbotyara/botyaratools",
+      cat: "selfhosted",
+      lang: "Python",
+      tags: ["yt-dlp", "ffmpeg", "media"],
+      desc: {
+        ru: "домашний веб-комбайн поверх yt-dlp и ffmpeg: скачка с 1000+ сайтов, сжатие под дискорд/телегу, mp3 320 kbps и обрезка без консоли.",
+        en: "self-hosted web toolbox for yt-dlp + ffmpeg: download from 1000+ sites, compress for discord/telegram, 320 kbps mp3 search, trim & extract audio."
+      }
+    },
+    {
+      name: "botyarashare",
+      url: "https://github.com/dimasbotyara/botyarashare",
+      cat: "selfhosted",
+      lang: "JavaScript",
+      tags: ["encrypted", "LAN", "fernet"],
+      desc: {
+        ru: "оффлайн-файлообменник для локалки с шифрованием fernet, временными ссылками, drag & drop и автоочисткой.",
+        en: "offline-first encrypted LAN file sharing (fernet), real-time via socket.io, expiring links, direct send & auto-cleanup."
+      }
+    },
+    {
+      name: "botyaraMC",
+      url: "https://github.com/dimasbotyara/botyaraMC",
+      cat: "selfhosted",
+      lang: "Python",
+      tags: ["minecraft", "mod-sync", "fabric/forge"],
+      desc: {
+        ru: "лаунчер модов для майнкрафта со своим сервером синхронизации, чтобы друзьям не кидать архивы вручную.",
+        en: "minecraft mod launcher paired with a self-hosted mod sync server so everyone stays on the exact same modpack."
+      }
+    },
+    {
+      name: "lantern-v2",
+      url: "https://github.com/dimasbotyara/lantern-v2",
+      cat: "selfhosted",
+      lang: "Python",
+      tags: ["fastapi", "pyqt5", "encrypted"],
+      desc: {
+        ru: "шифрованный десктопный мессенджер для локальной сети на fastapi + pyqt5: стикеры, опросы, файлы и автопоиск.",
+        en: "encrypted LAN desktop messenger built with fastapi + pyqt5 — websocket chat, file transfer, stickers, polls & auto-discovery."
+      }
+    },
+    {
+      name: "school-portal-game",
+      url: "https://github.com/dimasbotyara/school-portal-game",
+      cat: "selfhosted",
+      lang: "Python",
+      tags: ["flask", "sqlite", "offline"],
+      desc: {
+        ru: "«поиграть в школу» дома — оффлайн веб-портал с дневником, тестами, календарём контрольных, графиками и наградами.",
+        en: "play school at home — offline flask + sqlite web portal with a gradebook, self-graded tests, awards, and progress charts."
+      }
+    },
+
+    // LINUX & CLI
+    {
+      name: "botyaraPAD",
+      url: "https://github.com/dimasbotyara/botyaraPAD",
+      cat: "linux",
+      lang: "Python",
+      tags: ["pipewire", "soundpad", "wayland/x11"],
+      desc: {
+        ru: "аналог soundpad под linux на pipewire: пускаешь звуки прямо в микрофон для дискорда и игр, глобальные хоткеи на wayland + x11.",
+        en: "soundpad alternative for linux built on pipewire — play sounds straight into your mic for discord/obs/games with global wayland + x11 hotkeys."
+      }
+    },
+    {
+      name: "botyaraREC",
+      url: "https://github.com/dimasbotyara/botyaraREC",
+      cat: "linux",
+      lang: "Python",
+      tags: ["weak-pc", "ffmpeg", "x11"],
+      desc: {
+        ru: "лёгкий рекордер экрана для слабого железа: сначала пишет raw без тормозов, а в mp4 кодирует уже после стопа. дружит с easyeffects.",
+        en: "screen recorder built for weak hardware: captures raw first and encodes to mp4 after stopping — zero stutter, mic + system audio, easyeffects-aware."
+      }
+    },
+    {
+      name: "cli-anims",
+      url: "https://github.com/dimasbotyara/cli-anims",
+      cat: "linux",
+      lang: "Python",
+      tags: ["stdlib-only", "ansi", "20+ anims"],
+      desc: {
+        ru: "20+ анимаций в терминале на голом stdlib без зависимостей: пончик, матрица, чёрная дыра, аквариум, boids, салюты и игра «жизнь».",
+        en: "20+ pure-python terminal animations with zero dependencies: donut, matrix, black hole, aquarium, boids, fireworks, game of life — ansi truecolor."
+      }
+    },
+    {
+      name: "install-my-games",
+      url: "https://github.com/dimasbotyara/install-my-games",
+      cat: "linux",
+      lang: "Python",
+      tags: ["gruvbox", "alt-linux", "usb"],
+      desc: {
+        ru: "однофайловый установщик и лаунчер моих игр с флешки для школьных компов на alt linux: сам собирает venv, показывает мини-fastfetch и живёт в gruvbox dark.",
+        en: "one-file usb game installer & launcher for school linux labs (alt linux) — builds venvs, mini-fastfetch, self-updates from github, gruvbox dark."
+      }
+    },
+    {
+      name: "botyaradash",
+      url: "https://github.com/dimasbotyara/botyaradash",
+      cat: "linux",
+      lang: "Python",
+      tags: ["tui", "rich", "sysmon"],
+      desc: {
+        ru: "терминальный системный монитор на rich: cpu, озу, диски, сеть, gpu, батарея и процессы в живом дашборде.",
+        en: "cross-platform terminal system monitor built with rich — live cpu, ram, disk, network, gpu, battery & top processes dashboard."
+      }
+    },
+    {
+      name: "botyaraenc",
+      url: "https://github.com/dimasbotyara/botyaraenc",
+      cat: "linux",
+      lang: "Python",
+      tags: ["aes-256", "cli", "stealth"],
+      desc: {
+        ru: "cli-шифрование файлов и текста (aes-256 + pbkdf2), маскировка шифрофайлов под .jpg/.mp3/.pdf и передача по локалке.",
+        en: "cli encryption for files & text (aes-256-cbc + pbkdf2), file masquerading as .jpg/.mp3/.pdf, and LAN transfer in a rich tui."
+      }
+    },
+    {
+      name: "botyaranotes",
+      url: "https://github.com/dimasbotyara/botyaranotes",
+      cat: "linux",
+      lang: "Python",
+      tags: ["tui", "fernet", "pacman-style"],
+      desc: {
+        ru: "шифрованные заметки прямо в терминале с эстетикой arch pacman, тегами, бэкапами и 8 цветовыми темами.",
+        en: "terminal encrypted note vault with fernet + pbkdf2, tags, backups, 8 themes, and arch pacman aesthetic."
+      }
+    },
+    {
+      name: "botyarapix",
+      url: "https://github.com/dimasbotyara/botyarapix",
+      cat: "linux",
+      lang: "C++",
+      tags: ["c++17", "pixel-art", "procedural"],
+      desc: {
+        ru: "консольный генератор абстрактного монохромного пиксель-арта на c++17 — сиды, симметрия и экспорт в png.",
+        en: "cross-platform console generator for abstract monochrome pixel art in c++17 — seeds, symmetry, interactive menu & png export."
+      }
+    },
+    {
+      name: "dimasbotyara-rofi-launcher-theme",
+      url: "https://github.com/dimasbotyara/dimasbotyara-rofi-launcher-theme",
+      cat: "linux",
+      lang: "Shell",
+      tags: ["rofi", "ricing", "themes"],
+      desc: {
+        ru: "пак цветовых тем для rofi и shell-скрипты, чтобы переключать их на лету.",
+        en: "rofi launcher theme pack with color schemes for launcher.rasi and shell scripts to swap themes on the fly."
+      }
+    },
+
+    // WEIRD & FUN
+    {
+      name: "b-lang",
+      url: "https://github.com/dimasbotyara/b-lang",
+      cat: "weird",
+      lang: "Python",
+      tags: ["bees 🐝", "interpreter", "esolang"],
+      desc: {
+        ru: "🐝 собственный язык программирования про пчёл, написанный на питоне — с интерпретатором, stdlib и даже криптографией.",
+        en: "🐝 a bee-themed programming language implemented in python — interpreter core, stdlib, examples, and optional crypto/http extensions."
+      }
+    },
+    {
+      name: "botyaraexchange",
+      url: "https://github.com/dimasbotyara/botyaraexchange",
+      cat: "weird",
+      lang: "Python",
+      tags: ["fake-crypto", "chaos", "simulator"],
+      desc: {
+        ru: "криптобиржа с фейковыми рублями, 15 монетами, безумными графиками и 35+ скрытыми событиями рынка.",
+        en: "fake-money crypto exchange with zero real market data — 15 coins, chaotic charts, 35+ hidden market events & leaderboard."
+      }
+    },
+    {
+      name: "botyaracasino",
+      url: "https://github.com/dimasbotyara/botyaracasino",
+      cat: "weird",
+      lang: "HTML",
+      tags: ["fake-money", "14 games", "flask"],
+      desc: {
+        ru: "неоновое фейк-казино на flask: 14 мини-игр (слоты, краш, мины, блэкджек), чат и лидерборд. никаких реальных денег, чистый дофамин.",
+        en: "neon fake casino on flask with 14 mini-games (slots, crash, blackjack, mines, limbo), chat & leaderboard. zero real bets."
+      }
+    },
+    {
+      name: "altai_bees",
+      url: "https://github.com/dimasbotyara/altai_bees",
+      cat: "weird",
+      lang: "JavaScript",
+      tags: ["humor", "flask", "honey 🍯"],
+      desc: {
+        ru: "🐝 Алтай. Пчёлы. Мёд. — шуточный одностраничник на flask со словарём алтайских словечек и локальным юмором.",
+        en: "🐝 Altai. Bees. Honey. — humorous single-page flask app with a joke glossary of Altai words and local mountain humor."
+      }
+    },
+    {
+      name: "lm-studio-calculator",
+      url: "https://github.com/dimasbotyara/lm-studio-calculator",
+      cat: "weird",
+      lang: "TypeScript",
+      tags: ["lm-studio", "plugin", "math"],
+      desc: {
+        ru: "плагин научного калькулятора для lm studio, чтобы локальные llm перестали врать в математике.",
+        en: "scientific calculator plugin for lm studio so local llms stop hallucinating basic arithmetic and trigonometry."
+      }
+    },
+    {
+      name: "img2palette",
+      url: "https://github.com/dimasbotyara/img2palette",
+      cat: "weird",
+      lang: "Python",
+      tags: ["50+ themes", "ricer", "rich"],
+      desc: {
+        ru: "перекрашивает картинки, гифки и видео в 50+ цветовых палитр (gruvbox, catppuccin, nord, dracula и всё такое).",
+        en: "recolor images, gifs and video into 50+ color palettes — gruvbox, catppuccin, dracula, nord and more."
+      }
+    },
+    {
+      name: "botyaratime",
+      url: "https://github.com/dimasbotyara/botyaratime",
+      cat: "weird",
+      lang: "Python",
+      tags: ["clock", "particles", "10 themes"],
+      desc: {
+        ru: "красивые десктопные часы на pygame с одометр-анимацией цифр и искрами частиц на каждом тике.",
+        en: "eye-candy desktop clock on pygame with odometer-style digit transitions, particle bursts every tick, and 10 themes."
+      }
+    },
+    {
+      name: "nnn-countdown",
+      url: "https://github.com/dimasbotyara/nnn-countdown",
+      cat: "weird",
+      lang: "Python",
+      tags: ["joke", "desktop", "ayu-mirage"],
+      desc: {
+        ru: "шуточный десктопный таймер обратного отсчёта до начала и конца no nut november. просто потому что мог.",
+        en: "desktop joke countdown to the start & end of no nut november with live timer and bilingual ui. just because i could."
+      }
+    }
+  ],
+
+  fastfetch: {
+    ascii: [
+      "                  -`",
+      "                 .o+`",
+      "                `ooo/",
+      "               `+oooo:",
+      "              `+oooooo:",
+      "              -+oooooo+:",
+      "            `/:-:++oooo+:",
+      "           `/++++/+++++++:",
+      "          `/++++++++++++++:",
+      "         `/+++ooooooooooooo/`",
+      "        ./ooosssso++osssssso+`",
+      "       .oossssso-````/ossssss+`",
+      "      -osssssso.      :ssssssso.",
+      "     :osssssss/        osssso+++.",
+      "    /ossssssss/        +ssssooo/-",
+      "  `/ossssso+/:-        -:/+osssso+-",
+      " `+sso+:-`                 `.-/+oso:",
+      "`++:.                           `-/+/",
+      ".`                                 `/"
+    ],
+    specs: [
+      ["OS", "Arch Linux x86_64"],
+      ["Host", "HP Pavilion dv9700 Notebook PC"],
+      ["Kernel", "Linux 5.15.209-1-lts515"],
+      ["Shell", "fish 4.9.3"],
+      ["CPU", "Intel Core 2 Duo T5850 (2) @ 2.17 GHz"],
+      ["GPU", "NVIDIA GeForce 8600M GS"],
+      ["Memory", "561.55 MiB / 3.83 GiB (14%)"],
+      ["Battery", "0% [AC Connected, Unknown]"],
+      ["Locale", "ru_RU.UTF-8"]
+    ]
+  }
+};
