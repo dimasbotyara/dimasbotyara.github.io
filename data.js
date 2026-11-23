@@ -187,6 +187,17 @@ const SITE_DATA = {
       soundOnTooltip: "звуки включены — нажми, чтобы выключить",
       soundOffTooltip: "звуки выключены — нажми, чтобы включить",
       langTooltip: "сменить язык (клавиша L)",
+      settings: {
+        tooltip: "настройки: тема, звук и язык",
+        title: "настройки",
+        soundTitle: "микро-звуки",
+        soundNote: "мягкие тихие звуки интерфейса",
+        on: "вкл",
+        off: "выкл",
+        langTitle: "язык",
+        langNote: "переключается и клавишей L",
+        close: "закрыть"
+      },
       hero: {
         badge: "i use arch btw",
         greeting: "привет, я димас ботяра.",
@@ -476,6 +487,17 @@ const SITE_DATA = {
       soundOnTooltip: "micro-sounds on — click to mute",
       soundOffTooltip: "micro-sounds muted — click to enable",
       langTooltip: "switch language (press L)",
+      settings: {
+        tooltip: "settings: theme, sound & language",
+        title: "settings",
+        soundTitle: "micro-sounds",
+        soundNote: "soft quiet ui sounds",
+        on: "on",
+        off: "off",
+        langTitle: "language",
+        langNote: "or just press L",
+        close: "close"
+      },
       hero: {
         badge: "i use arch btw",
         greeting: "hey, i'm dimasbotyara.",

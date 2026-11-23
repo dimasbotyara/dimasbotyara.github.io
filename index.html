@@ -112,55 +112,27 @@
       </nav>
 
       <div class="topbar-controls">
-        <!-- Language Switcher -->
-        <div class="lang-switch" role="group" aria-label="Language switcher" id="langSwitch">
-          <button type="button" class="lang-btn" data-lang="ru" aria-pressed="true">ru</button>
-          <button type="button" class="lang-btn" data-lang="en" aria-pressed="false">en</button>
-        </div>
-
-        <!-- Visible Palette Switcher (Gruvbox Dark / Light / Catppuccin Mocha / Ayu Mirage / Nord) -->
-        <div class="theme-picker" id="themePicker">
-          <button
-            type="button"
-            class="icon-btn theme-btn"
-            id="themeToggle"
-            aria-haspopup="menu"
-            aria-expanded="false"
-            aria-controls="themeMenu"
-            aria-label="pick color palette"
-            title="pick palette"
-          >
-            <span class="theme-mini-dots" aria-hidden="true">
-              <i style="background:var(--yellow)"></i>
-              <i style="background:var(--green)"></i>
-              <i style="background:var(--purple)"></i>
-            </span>
-            <span class="theme-label" id="themeLabel">gruvbox</span>
-            <svg class="theme-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="m6 9 6 6 6-6"></path>
-            </svg>
-          </button>
-          <div class="theme-menu" id="themeMenu" role="menu" hidden></div>
-        </div>
-
-        <!-- Subtle Micro-SFX Toggle (muted by default) -->
+        <!-- Unified settings overlay (palette + micro-sounds + language) -->
         <button
           type="button"
-          class="icon-btn sound-btn"
-          id="soundToggle"
-          aria-pressed="false"
-          aria-label="toggle micro-sounds"
-          title="toggle sound"
+          class="icon-btn settings-btn"
+          id="settingsToggle"
+          aria-haspopup="dialog"
+          aria-expanded="false"
+          aria-controls="settingsOverlay"
+          aria-label="site settings"
+          title="settings"
         >
-          <svg class="icon-sound-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M11 5 6 9H2v6h4l5 4V5Z"></path>
-            <path d="m22 9-6 6"></path>
-            <path d="m16 9 6 6"></path>
-          </svg>
-          <svg class="icon-sound-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M11 5 6 9H2v6h4l5 4V5Z"></path>
-            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="4" y1="21" x2="4" y2="14"></line>
+            <line x1="4" y1="10" x2="4" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12" y2="3"></line>
+            <line x1="20" y1="21" x2="20" y2="16"></line>
+            <line x1="20" y1="12" x2="20" y2="3"></line>
+            <line x1="1" y1="14" x2="7" y2="14"></line>
+            <line x1="9" y1="8" x2="15" y2="8"></line>
+            <line x1="17" y1="16" x2="23" y2="16"></line>
           </svg>
         </button>
 
@@ -189,6 +161,64 @@
       <a href="#stack" data-i18n="nav.stack">стек</a>
     </nav>
   </header>
+
+  <!-- Unified settings overlay: palette + micro-sounds + language -->
+  <div class="settings-overlay" id="settingsOverlay" hidden>
+    <div class="settings-card" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <div class="settings-head">
+        <h2 class="settings-title" id="settingsTitle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="4" y1="21" x2="4" y2="14"></line>
+            <line x1="4" y1="10" x2="4" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12" y2="3"></line>
+            <line x1="20" y1="21" x2="20" y2="16"></line>
+            <line x1="20" y1="12" x2="20" y2="3"></line>
+            <line x1="1" y1="14" x2="7" y2="14"></line>
+            <line x1="9" y1="8" x2="15" y2="8"></line>
+            <line x1="17" y1="16" x2="23" y2="16"></line>
+          </svg>
+          <span data-i18n="settings.title">настройки</span>
+        </h2>
+        <button type="button" class="icon-btn settings-close" id="settingsClose" aria-label="закрыть">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 6 6 18"></path>
+            <path d="m6 6 12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Palette (Gruvbox Dark / Light / Catppuccin Mocha / Ayu Mirage / Nord) -->
+      <div class="settings-group">
+        <p class="settings-group-label" data-i18n="themeMenuTitle">палитры</p>
+        <div class="settings-theme-list" id="settingsThemeList" role="radiogroup" aria-label="color palettes"></div>
+      </div>
+
+      <!-- Micro-SFX -->
+      <div class="settings-group">
+        <p class="settings-group-label" data-i18n="settings.soundTitle">микро-звуки</p>
+        <div class="settings-row">
+          <span class="settings-row-note" data-i18n="settings.soundNote">мягкие тихие звуки интерфейса</span>
+          <div class="sound-switch" role="group" aria-label="micro-sounds" id="soundSwitch">
+            <button type="button" class="sound-opt" data-sound="on" aria-pressed="false" data-i18n="settings.on">вкл</button>
+            <button type="button" class="sound-opt" data-sound="off" aria-pressed="true" data-i18n="settings.off">выкл</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Language -->
+      <div class="settings-group">
+        <p class="settings-group-label" data-i18n="settings.langTitle">язык</p>
+        <div class="settings-row">
+          <span class="settings-row-note" data-i18n="settings.langNote">переключается и клавишей L</span>
+          <div class="lang-switch" role="group" aria-label="Language switcher" id="langSwitch">
+            <button type="button" class="lang-btn" data-lang="ru" aria-pressed="true">ru</button>
+            <button type="button" class="lang-btn" data-lang="en" aria-pressed="false">en</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <main>
     <!-- HERO SECTION -->
