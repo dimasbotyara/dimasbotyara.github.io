@@ -244,11 +244,12 @@
 
   function setSound(enabled, persist, playFeedback) {
     state.sound = !!enabled;
-    var btn = document.getElementById("soundToggle");
-    if (btn) {
-      btn.setAttribute("aria-pressed", state.sound ? "true" : "false");
-      btn.setAttribute("title", state.sound ? t("soundOnTooltip") : t("soundOffTooltip"));
-    }
+    document.querySelectorAll(".sound-opt").forEach(function (btn) {
+      var isOn = btn.dataset.sound === "on";
+      btn.setAttribute("aria-pressed", isOn === state.sound ? "true" : "false");
+    });
+    var sw = document.getElementById("soundSwitch");
+    if (sw) sw.setAttribute("title", state.sound ? t("soundOnTooltip") : t("soundOffTooltip"));
     if (persist) {
       try {
         localStorage.setItem("dimas_sound", state.sound ? "on" : "off");
@@ -315,47 +316,51 @@
     return null;
   }
 
-  function renderThemeMenu() {
-    var menu = document.getElementById("themeMenu");
-    if (!menu) return;
-    var list = SITE_DATA.themes || [];
-    var head = '<div class="theme-menu-head">' + escapeHtml(t("themeMenuTitle") || "palettes") + "</div>";
-    var items = list.map(function (th) {
+  function renderThemeOptions() {
+    var list = document.getElementById("settingsThemeList");
+    if (!list) return;
+    var themes = SITE_DATA.themes || [];
+    var items = themes.map(function (th) {
       var active = th.id === state.theme;
       var dots = th.swatches.map(function (c) {
         return '<i style="background:' + c + '"></i>';
       }).join("");
       return (
-        '<button type="button" class="theme-option' + (active ? " is-active" : "") + '" role="menuitemradio" aria-checked="' + (active ? "true" : "false") + '" data-theme-id="' + th.id + '">' +
+        '<button type="button" class="theme-option' + (active ? " is-active" : "") + '" role="radio" aria-checked="' + (active ? "true" : "false") + '" data-theme-id="' + th.id + '" title="' + escapeHtml(t("themeTooltip")) + '">' +
           '<span>' + escapeHtml(th.name[state.lang] || th.name.en) + "</span>" +
           '<span class="theme-swatches" aria-hidden="true">' + dots + "</span>" +
         "</button>"
       );
     }).join("");
-    menu.innerHTML = head + items;
+    list.innerHTML = items;
 
-    menu.querySelectorAll(".theme-option").forEach(function (btn) {
+    list.querySelectorAll(".theme-option").forEach(function (btn) {
       btn.addEventListener("click", function () {
         setTheme(btn.dataset.themeId, true, true);
-        closeThemeMenu();
       });
     });
   }
 
-  function openThemeMenu() {
-    var menu = document.getElementById("themeMenu");
-    var btn = document.getElementById("themeToggle");
-    if (!menu || !btn) return;
-    menu.hidden = false;
-    btn.setAttribute("aria-expanded", "true");
+  function openSettings() {
+    var overlay = document.getElementById("settingsOverlay");
+    var btn = document.getElementById("settingsToggle");
+    if (!overlay) return;
+    renderThemeOptions();
+    overlay.hidden = false;
+    if (btn) btn.setAttribute("aria-expanded", "true");
+    document.body.classList.add("settings-open");
+    var closeBtn = document.getElementById("settingsClose");
+    if (closeBtn) closeBtn.focus();
   }
 
-  function closeThemeMenu() {
-    var menu = document.getElementById("themeMenu");
-    var btn = document.getElementById("themeToggle");
-    if (!menu || !btn) return;
-    menu.hidden = true;
-    btn.setAttribute("aria-expanded", "false");
+  function closeSettings(restoreFocus) {
+    var overlay = document.getElementById("settingsOverlay");
+    var btn = document.getElementById("settingsToggle");
+    if (!overlay || overlay.hidden) return;
+    overlay.hidden = true;
+    if (btn) btn.setAttribute("aria-expanded", "false");
+    document.body.classList.remove("settings-open");
+    if (restoreFocus && btn) btn.focus();
   }
 
   function setTheme(themeId, persist, withSound) {
@@ -368,12 +373,7 @@
       metaTheme.setAttribute("content", themeObj.themeColor);
     }
 
-    var label = document.getElementById("themeLabel");
-    if (label) {
-      label.textContent = themeObj.short;
-    }
-
-    renderThemeMenu();
+    renderThemeOptions();
 
     if (persist) {
       try {
@@ -410,10 +410,12 @@
     });
 
     // Update tooltips
-    var themeBtn = document.getElementById("themeToggle");
-    if (themeBtn) themeBtn.setAttribute("title", t("themeTooltip"));
-    var soundBtn = document.getElementById("soundToggle");
-    if (soundBtn) soundBtn.setAttribute("title", state.sound ? t("soundOnTooltip") : t("soundOffTooltip"));
+    var settingsBtn = document.getElementById("settingsToggle");
+    if (settingsBtn) settingsBtn.setAttribute("title", t("settings.tooltip"));
+    var settingsClose = document.getElementById("settingsClose");
+    if (settingsClose) settingsClose.setAttribute("aria-label", t("settings.close"));
+    var soundSwitch = document.getElementById("soundSwitch");
+    if (soundSwitch) soundSwitch.setAttribute("title", state.sound ? t("soundOnTooltip") : t("soundOffTooltip"));
     var langSwitch = document.getElementById("langSwitch");
     if (langSwitch) langSwitch.setAttribute("title", t("langTooltip"));
     var tgBtn = document.getElementById("telegramCopyBtn");
@@ -421,7 +423,7 @@
     var dcBtn = document.getElementById("discordCopyBtn");
     if (dcBtn) dcBtn.setAttribute("title", t("hero.discordTooltip"));
 
-    renderThemeMenu();
+    renderThemeOptions();
 
     // Update static i18n text nodes
     document.querySelectorAll("[data-i18n]").forEach(function (el) {
@@ -1993,34 +1995,40 @@
       });
     }
 
-    // Visible Palette Picker dropdown
-    var themePicker = document.getElementById("themePicker");
-    var themeBtn = document.getElementById("themeToggle");
-    var themeMenu = document.getElementById("themeMenu");
-    if (themeBtn && themeMenu) {
-      themeBtn.addEventListener("click", function (e) {
-        e.stopPropagation();
-        if (themeMenu.hidden) {
-          openThemeMenu();
+    // Unified settings overlay (palette + micro-sounds + language)
+    var settingsToggle = document.getElementById("settingsToggle");
+    var settingsOverlay = document.getElementById("settingsOverlay");
+    var settingsCloseBtn = document.getElementById("settingsClose");
+    if (settingsToggle && settingsOverlay) {
+      settingsToggle.addEventListener("click", function () {
+        if (settingsOverlay.hidden) {
+          openSettings();
         } else {
-          closeThemeMenu();
+          closeSettings(true);
         }
       });
 
-      document.addEventListener("click", function (e) {
-        if (!themeMenu.hidden && themePicker && !themePicker.contains(e.target)) {
-          closeThemeMenu();
+      settingsOverlay.addEventListener("click", function (e) {
+        if (e.target === settingsOverlay) {
+          closeSettings(true);
         }
       });
     }
-
-    // Sound toggle button
-    var soundBtn = document.getElementById("soundToggle");
-    if (soundBtn) {
-      soundBtn.addEventListener("click", function () {
-        setSound(!state.sound, true, true);
+    if (settingsCloseBtn) {
+      settingsCloseBtn.addEventListener("click", function () {
+        closeSettings(true);
       });
     }
+
+    // Sound segmented switch (inside settings)
+    document.querySelectorAll(".sound-opt").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var wantOn = btn.dataset.sound === "on";
+        if (wantOn !== state.sound) {
+          setSound(wantOn, true, true);
+        }
+      });
+    });
 
     // Language buttons
     document.querySelectorAll(".lang-btn").forEach(function (btn) {
@@ -2051,7 +2059,7 @@
     // Keyboard shortcuts (vim / linux nerd friendly!)
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape") {
-        closeThemeMenu();
+        closeSettings(true);
         return;
       }
       var tag = document.activeElement && document.activeElement.tagName;

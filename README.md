@@ -20,10 +20,11 @@ My personal GitHub Pages homepage — built with plain **HTML, CSS, and vanilla 
 
 ## ✨ what's inside
 
-- 🎨 **5 color palettes** — **Gruvbox Dark** (default), **Gruvbox Light**, **Catppuccin Mocha**, **Ayu Mirage**, and **Nord**. Pick from the visible topbar palette dropdown, press `T`, or switch right in the terminal (`theme catppuccin`, `theme ayu`, `theme nord`, `theme list`).
+- 🎨 **5 color palettes** — **Gruvbox Dark** (default), **Gruvbox Light**, **Catppuccin Mocha**, **Ayu Mirage**, and **Nord**. Pick from the unified ⚙ settings menu, press `T`, or switch right in the terminal (`theme catppuccin`, `theme ayu`, `theme nord`, `theme list`).
 - 🌍 **Bilingual RU / EN** — auto-detects your browser locale (`navigator.languages`), supports `?lang=en` / `?lang=ru`, plus a manual switcher.
 - 🔤 **5 distinct fonts** — `Unbounded` (headings), `Press Start 2P` (pixel accents across both Latin & Cyrillic), `JetBrains Mono` (terminal & code), `Rubik` (body), and `Caveat` (handwritten notes).
-- 🔊 **Gentle micro-SFX** — pure Web Audio API soft sounds (muted by default, toggle via the topbar button or `sound` in the terminal — zero audio files).
+- 🔊 **Gentle micro-SFX** — pure Web Audio API soft sounds (muted by default, toggle via the ⚙ settings menu or `sound` in the terminal — zero audio files).
+- ⚙️ **Unified settings menu** — one cozy overlay for palette, micro-sounds and language keeps the topbar slim and phone-friendly (no horizontal scroll).
 - 💻 **Interactive `fish 4.9.3` terminal** — starts with `touch grass` & `fastfetch` from my old HP Pavilion dv9700, supports `25+` commands (`help`, `htop`, `battery`, `pacman -Syu`, `cowsay`, `frogsay`, `matrix`, `fortune`, `crab`, `wildlife`, `guest`, `contacts`, `theme`, `sound`, `lang`, and more) with ↑/↓ history.
 - 🦀 **Tide Crab & visiting pixel wildlife** — exact pixel sprites, RGB palettes, and 4-frame wing/leg animations straight from [`pygame-slide-survivors/wildlife.py`](https://github.com/dimasbotyara/pygame-slide-survivors). Tide Crab lives on the coast (44 quotes!), while **Clover Moth**, **Echo Bat**, **Rune Wisp**, **Reed Toad**, and **Cinder Slug** periodically drop by — click any visitor to pause and chat with them, or leave them alone for 20s and they'll head off on their way 🦋🦇🐸.
 - ⭐ **All 51 repositories** — 6 favorites at the top, [`alchemy-matcher`](https://dimasbotyara.github.io/alchemy-matcher/) playable right in the browser, and a filterable/searchable shelf with a **random repo roller** 🎲.

@@ -230,6 +230,7 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 86px;
+  overflow-x: clip;
 }
 
 body {
@@ -442,70 +443,107 @@ code {
   flex-shrink: 0;
 }
 
-.theme-picker {
-  position: relative;
-}
-
-.theme-mini-dots {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-}
-
-.theme-mini-dots i {
-  display: block;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-}
-
-.theme-label {
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--fg2);
-}
-
-.theme-caret {
-  width: 13px !important;
-  height: 13px !important;
-  color: var(--fg4);
-  transition: transform 0.18s var(--ease);
-}
-
-.theme-btn[aria-expanded="true"] .theme-caret {
-  transform: rotate(180deg);
-}
-
-.theme-menu {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  min-width: 215px;
-  padding: 6px;
-  background: var(--bg-card);
-  border: 2px solid var(--bg2);
-  border-radius: var(--radius-md);
-  box-shadow: 5px 5px 0 var(--shadow-color);
-  z-index: 200;
+/* Unified settings overlay (palette + micro-sounds + language) */
+.settings-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
   display: flex;
-  flex-direction: column;
-  gap: 3px;
-  animation: popIn 0.14s var(--ease);
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(20, 22, 23, 0.55);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  animation: popIn 0.16s var(--ease);
 }
 
-.theme-menu[hidden] {
+.settings-overlay[hidden] {
   display: none;
 }
 
-.theme-menu-head {
-  padding: 4px 8px 6px;
+body.settings-open {
+  overflow: hidden;
+}
+
+.settings-card {
+  width: min(380px, 100%);
+  max-height: calc(100vh - 36px);
+  overflow-y: auto;
+  padding: 15px 16px 17px;
+  background: var(--bg-card);
+  border: 2px solid var(--bg2);
+  border-radius: var(--radius-md);
+  box-shadow: 6px 6px 0 var(--shadow-color);
+  animation: popIn 0.18s var(--ease);
+  scrollbar-width: thin;
+}
+
+.settings-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.settings-title {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--fg0);
+}
+
+.settings-title svg {
+  width: 18px;
+  height: 18px;
+  color: var(--yellow);
+  flex-shrink: 0;
+}
+
+.settings-close {
+  width: 34px;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.settings-group {
+  margin-top: 12px;
+  padding-top: 11px;
+  border-top: 1px dashed var(--bg2);
+}
+
+.settings-group-label {
+  margin: 0 0 8px;
   font-family: var(--font-mono);
   font-size: 0.68rem;
   text-transform: lowercase;
   color: var(--fg4);
-  border-bottom: 1px dashed var(--bg2);
-  margin-bottom: 2px;
+}
+
+.settings-theme-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 36px;
+}
+
+.settings-row-note {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--fg4);
+  line-height: 1.35;
 }
 
 .theme-option {
@@ -556,22 +594,42 @@ code {
   border: 1px solid rgba(128, 128, 128, 0.35);
 }
 
-/* Sound micro-SFX toggle */
-.sound-btn {
-  width: 36px;
-  padding: 0;
+/* Sound segmented switch (inside settings overlay) */
+.sound-switch {
+  display: inline-flex;
+  flex-shrink: 0;
+  background: var(--bg1);
+  border: 1.5px solid var(--bg2);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+}
+
+.sound-opt {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 4px;
   color: var(--fg4);
+  transition: background-color 0.18s, color 0.18s;
 }
 
-.sound-btn[aria-pressed="true"] {
-  border-color: var(--green);
-  color: var(--green);
+.sound-opt:hover {
+  color: var(--fg0);
 }
 
-.sound-btn .icon-sound-on { display: none; }
-.sound-btn .icon-sound-off { display: block; }
-.sound-btn[aria-pressed="true"] .icon-sound-on { display: block; }
-.sound-btn[aria-pressed="true"] .icon-sound-off { display: none; }
+.sound-opt[data-sound="on"][aria-pressed="true"] {
+  background: var(--green);
+  color: var(--btn-primary-fg);
+}
+
+.sound-opt[data-sound="off"][aria-pressed="true"] {
+  background: var(--bg2);
+  color: var(--fg1);
+}
 
 .gh-btn {
   width: 36px;
@@ -2515,13 +2573,10 @@ code {
   }
 
   .gh-btn,
-  .sound-btn {
+  .settings-btn,
+  .settings-close {
     width: 34px;
     padding: 0;
-  }
-
-  .theme-label {
-    display: none;
   }
 
   .favs-grid,
