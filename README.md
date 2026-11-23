@@ -26,7 +26,7 @@ My personal GitHub Pages homepage — built with plain **HTML, CSS, and vanilla 
 - 🔊 **Gentle micro-SFX** — pure Web Audio API soft sounds (muted by default, toggle via the topbar button or `sound` in the terminal — zero audio files).
 - 💻 **Interactive `fish 4.9.3` terminal** — starts with `touch grass` & `fastfetch` from my old HP Pavilion dv9700, supports `25+` commands (`help`, `htop`, `battery`, `pacman -Syu`, `cowsay`, `frogsay`, `matrix`, `fortune`, `crab`, `wildlife`, `guest`, `contacts`, `theme`, `sound`, `lang`, and more) with ↑/↓ history.
 - 🦀 **Tide Crab & visiting pixel wildlife** — exact pixel sprites, RGB palettes, and 4-frame wing/leg animations straight from [`pygame-slide-survivors/wildlife.py`](https://github.com/dimasbotyara/pygame-slide-survivors). Tide Crab lives on the coast (44 quotes!), while **Clover Moth**, **Echo Bat**, **Rune Wisp**, **Reed Toad**, and **Cinder Slug** periodically drop by — click any visitor to pause and chat with them, or leave them alone for 20s and they'll head off on their way 🦋🦇🐸.
-- ⭐ **All 49 repositories** — 6 favorites at the top, [`alchemy-matcher`](https://dimasbotyara.github.io/alchemy-matcher/) playable right in the browser, and a filterable/searchable shelf with a **random repo roller** 🎲.
+- ⭐ **All 51 repositories** — 6 favorites at the top, [`alchemy-matcher`](https://dimasbotyara.github.io/alchemy-matcher/) playable right in the browser, and a filterable/searchable shelf with a **random repo roller** 🎲.
 - 🧮 **Retro calculator** — just a totally normal calculator sitting next to the browser game. Nothing suspicious here at all 🤭.
 - 📱 **Responsive & share-ready** — tuned for phones, tablets, and desktops, with one-click copy for Telegram (`@dimasbotyara`) and Discord (`@dimas888`), plus a crisp Open Graph preview card (`assets/og-card.png`).
 
@@ -69,7 +69,7 @@ Then open `http://localhost:8080`.
 .
 ├── index.html       # layout & anti-FOUC theme/locale bootstrap
 ├── styles.css       # Gruvbox Dark/Light themes, 5-font typography & responsive rules
-├── data.js          # RU/EN copy, Tide Crab pixels, all 49 repos & fastfetch data
+├── data.js          # RU/EN copy, Tide Crab pixels, all 51 repos & fastfetch data
 ├── app.js           # i18n, themes, terminal, Tide Crab AI, calculator & filters
 ├── favicon.svg      # pixel Gruvbox frog icon
 ├── assets/          # EN & RU README SVG banners + Open Graph card (og-card.png)

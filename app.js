@@ -820,7 +820,7 @@
       return (
         '<span class="t-aqua">botyaranewtab/</span>  <span class="t-aqua">botyaratalk/</span>  <span class="t-err">pygame-slide-survivors/</span>  <span class="t-orange">botyarapong/</span><br/>' +
         '<span class="t-aqua">botyaracloud/</span>   <span class="t-ok">botyarajump/</span>  <span class="t-purple">alchemy-matcher/</span>         <span class="t-warn">b-lang/</span><br/>' +
-        '<span class="t-dim">README.md  ... (+41 repos — see #shelf)</span>'
+        '<span class="t-dim">README.md  ... (+43 repos — see #shelf)</span>'
       );
     }
     if (lower === "pwd") {
