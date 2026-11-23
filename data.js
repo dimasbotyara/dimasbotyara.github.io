@@ -10,7 +10,7 @@ const SITE_DATA = {
   telegramCopyValue: "@dimasbotyara",
   discordHandle: "@dimas888",
   discordCopyValue: "dimas888",
-  totalRepos: 49,
+  totalRepos: 51,
 
   // Color palettes (Gruvbox Dark default + Gruvbox Light + Catppuccin Mocha + Ayu Mirage + Nord)
   themes: [
@@ -292,7 +292,7 @@ const SITE_DATA = {
             "могу проходить сквозь стены, но решил зависнуть прямо в твоём браузере",
             "свечусь ровно на rgb(171, 191, 116) [[swatch:rgb(171, 191, 116)]] — энергосберегающий!",
             "33 hp, класс ghost, 0 облачных серверов",
-            "я видел все 49 репозиториев димаса... некоторые реально древние руины 🤭",
+            "я видел все 51 репозиторий димаса... некоторые реально древние руины 🤭",
             "✨",
             "не бойся, я не кусаюсь... пока радиус не 31 пиксель",
             "поболтаем ещё или мне парить дальше по сайту?"
@@ -348,14 +348,14 @@ const SITE_DATA = {
         playBtn: "запустить",
         codeBtn: "код",
         openRepo: "репозиторий",
-        shelfEyebrow: "// 49 репо и не останавливаюсь",
+        shelfEyebrow: "// 51 репо и не останавливаюсь",
         shelfTitle: "полка со всяким разным",
         shelfNote: "от rts и поддельного казино до языка программирования про пчёл",
         searchPlaceholder: "поиск по названию, описанию, стеку...",
         randomBtn: "рандомный репо",
         randomPicked: "выпало вот это:",
         emptySearch: "ничего не нашлось... попробуй другое слово или жми рандом :)",
-        allReposLink: "смотреть все 49 репозиториев на github",
+        allReposLink: "смотреть все 51 репозиторий на github",
         aboutEyebrow: "// честно и без воды",
         aboutTitle: "как я пишу код и на чём сижу",
         stackEyebrow: "// мой зоопарк инструментов",
@@ -581,7 +581,7 @@ const SITE_DATA = {
             "i can phase through walls, yet i chose to haunt your browser tab",
             "glowing at exactly rgb(171, 191, 116) [[swatch:rgb(171, 191, 116)]] — eco-friendly!",
             "33 hp, ghost archetype, zero cloud servers",
-            "i've drifted through all 49 repos... some really are ancient ruins 🤭",
+            "i've drifted through all 51 repos... some really are ancient ruins 🤭",
             "✨",
             "don't worry, i don't bite... unless you step inside 31 pixels",
             "wanna chat more or should i drift off along the page?"
@@ -637,14 +637,14 @@ const SITE_DATA = {
         playBtn: "play now",
         codeBtn: "source",
         openRepo: "repo",
-        shelfEyebrow: "// 49 repos and counting",
+        shelfEyebrow: "// 51 repos and counting",
         shelfTitle: "the project shelf",
         shelfNote: "from a pure-python RTS and fake casino to a bee-themed programming language",
         searchPlaceholder: "filter by name, vibe, stack...",
         randomBtn: "roll random repo",
         randomPicked: "you rolled:",
         emptySearch: "nothing matched... try another word or hit random :)",
-        allReposLink: "browse all 49 repositories on github",
+        allReposLink: "browse all 51 repositories on github",
         aboutEyebrow: "// honest & zero fluff",
         aboutTitle: "how i code & what runs it",
         stackEyebrow: "// my box of tools",
@@ -942,6 +942,17 @@ const SITE_DATA = {
         en: "pygame mini-game pack (connect four, pong, reaction, tic-tac-toe) — play locally, vs bot, or over LAN via pluggable registry."
       }
     },
+    {
+      name: "botyarahack",
+      url: "https://github.com/dimasbotyara/botyarahack",
+      cat: "games",
+      lang: "Python",
+      tags: ["hacker-simulator", "8 mini-games", "5 themes"],
+      desc: {
+        ru: "симулятор хакерского терминала, в который реально можно играть: матричный дождь, ascii-арт, живой лог взлома, 5 тем и 8 мини-игр. это игра, а не хакерский инструмент.",
+        en: "hacker terminal simulator you can actually play — matrix rain, ascii art, live exploit log, 5 themes, 8 mini-games. a game, not a real hacking tool."
+      }
+    },
 
     // SELF-HOSTED / LAN
     {
@@ -1019,6 +1030,17 @@ const SITE_DATA = {
       desc: {
         ru: "«поиграть в школу» дома — оффлайн веб-портал с дневником, тестами, календарём контрольных, графиками и наградами.",
         en: "play school at home — offline flask + sqlite web portal with a gradebook, self-graded tests, awards, and progress charts."
+      }
+    },
+    {
+      name: "learn-git",
+      url: "https://github.com/dimasbotyara/learn-git",
+      cat: "selfhosted",
+      lang: "JS / Flask",
+      tags: ["git course", "terminal trainer", "10 themes"],
+      desc: {
+        ru: "курс по git для полных новичков — теория простым языком, 11 уроков с квизами и практикой и тренажёр с фейковым git прямо в браузере. 10 тем, два языка, работает офлайн.",
+        en: "interactive git course for absolute beginners — plain-language theory, 11 lessons with quizzes & hands-on practice, and a fake-git terminal trainer. 10 themes, two languages, fully offline."
       }
     },
 
