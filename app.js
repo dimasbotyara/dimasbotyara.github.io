@@ -34,7 +34,10 @@
     git: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M6 8.5v2a4 4 0 0 0 4 4h4a4 4 0 0 0 4-4v-2"/><path d="M12 14.5v1"/></svg>',
     ide: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h3"/><path d="M7 13h6"/><path d="M7 17h4"/></svg>',
     note: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 7l3 11 5 4 5-4 3-11-8-5Z"/></svg>',
-    audio: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>'
+    audio: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
+    socketio: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m13.5 6.5-4.5 6h5l-3.5 5 5.5-7h-5Z"/></svg>',
+    pipewire: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h2"/><path d="M18 12h2"/><path d="M7 8.5v7"/><path d="M17 8.5v7"/><path d="M10 6.5v11"/><path d="M14 6.5v11"/></svg>',
+    ffmpeg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 5v14"/><path d="M17 5v14"/><path d="M3 9h4"/><path d="M3 15h4"/><path d="M17 9h4"/><path d="M17 15h4"/><path d="m10.5 10 4 2-4 2v-4Z"/></svg>'
   };
 
   const LANG_COLORS = {
@@ -384,6 +387,61 @@
     if (restoreFocus && btn) btn.focus();
   }
 
+  var lastStackTrigger = null;
+  var openStackGroup = -1;
+  var openStackItem = -1;
+
+  function openStackOverlay(groupIdx, itemIdx) {
+    var overlay = document.getElementById("stackOverlay");
+    if (!overlay) return;
+    var groups = t("stackGroups") || [];
+    var group = groups[groupIdx];
+    if (!group || !group.items[itemIdx]) return;
+    var item = group.items[itemIdx];
+
+    if (overlay.hidden) {
+      lastStackTrigger = document.activeElement;
+    }
+    openStackGroup = groupIdx;
+    openStackItem = itemIdx;
+
+    var iconWrap = document.getElementById("stackOverlayIcon");
+    var nameEl = document.getElementById("stackOverlayName");
+    var descEl = document.getElementById("stackOverlayDesc");
+    var linkEl = document.getElementById("stackOverlayLink");
+    var closeBtn = document.getElementById("stackOverlayClose");
+
+    if (iconWrap) iconWrap.innerHTML = ICONS[item.icon] || ICONS.code;
+    if (nameEl) nameEl.textContent = item.name;
+    if (descEl) descEl.textContent = item.desc || "";
+    if (linkEl) {
+      linkEl.href = item.url || "#";
+      var visitLabel = t("stackOverlay.visitSite") || "official website";
+      var linkLabel = linkEl.querySelector("[data-i18n='stackOverlay.visitSite']");
+      if (linkLabel) linkLabel.textContent = visitLabel;
+    }
+    if (closeBtn) {
+      closeBtn.setAttribute("aria-label", t("stackOverlay.close") || "close");
+    }
+
+    overlay.hidden = false;
+    document.body.classList.add("stack-overlay-open");
+    if (closeBtn) closeBtn.focus();
+  }
+
+  function closeStackOverlay(restoreFocus) {
+    var overlay = document.getElementById("stackOverlay");
+    if (!overlay || overlay.hidden) return;
+    overlay.hidden = true;
+    document.body.classList.remove("stack-overlay-open");
+    openStackGroup = -1;
+    openStackItem = -1;
+    if (restoreFocus && lastStackTrigger && typeof lastStackTrigger.focus === "function") {
+      lastStackTrigger.focus();
+    }
+    lastStackTrigger = null;
+  }
+
   function setTheme(themeId, persist, withSound) {
     var themeObj = getThemeObj(themeId);
     state.theme = themeObj.id;
@@ -439,6 +497,8 @@
     if (menuBtn) menuBtn.setAttribute("title", t("menu.tooltip"));
     var menuCloseBtn = document.getElementById("menuClose");
     if (menuCloseBtn) menuCloseBtn.setAttribute("aria-label", t("menu.close"));
+    var stackCloseBtn = document.getElementById("stackOverlayClose");
+    if (stackCloseBtn) stackCloseBtn.setAttribute("aria-label", t("stackOverlay.close") || "close");
     var soundSwitch = document.getElementById("soundSwitch");
     if (soundSwitch) soundSwitch.setAttribute("title", state.sound ? t("soundOnTooltip") : t("soundOffTooltip"));
     var langSwitch = document.getElementById("langSwitch");
@@ -477,6 +537,13 @@
     if (state.highlightedRepo) {
       var repo = SITE_DATA.shelf.find(function (r) { return r.name === state.highlightedRepo; });
       if (repo) showRandomBanner(repo);
+    }
+
+    var stackOv = document.getElementById("stackOverlay");
+    if (stackOv && !stackOv.hidden && openStackGroup >= 0 && openStackItem >= 0) {
+      openStackOverlay(openStackGroup, openStackItem);
+      var refreshedTrigger = document.querySelector('.stack-item[data-stack-group="' + openStackGroup + '"][data-stack-item="' + openStackItem + '"]');
+      if (refreshedTrigger) lastStackTrigger = refreshedTrigger;
     }
   }
 
@@ -677,13 +744,13 @@
     if (!wrap) return;
     var groups = t("stackGroups") || [];
 
-    wrap.innerHTML = groups.map(function (g) {
-      var itemsHtml = g.items.map(function (it) {
+    wrap.innerHTML = groups.map(function (g, gi) {
+      var itemsHtml = g.items.map(function (it, ii) {
         return (
-          '<span class="stack-item">' +
+          '<button type="button" class="stack-item" data-stack-group="' + gi + '" data-stack-item="' + ii + '">' +
             (ICONS[it.icon] || ICONS.code) +
             '<span>' + escapeHtml(it.name) + "</span>" +
-          "</span>"
+          "</button>"
         );
       }).join("");
 
@@ -2076,6 +2143,34 @@
       });
     }
 
+    // Stack item detail overlay
+    var stackOverlay = document.getElementById("stackOverlay");
+    var stackOverlayClose = document.getElementById("stackOverlayClose");
+    var stackGroupsWrap = document.getElementById("stackGroups");
+    if (stackGroupsWrap) {
+      stackGroupsWrap.addEventListener("click", function (e) {
+        var btn = e.target.closest(".stack-item");
+        if (!btn) return;
+        var gi = parseInt(btn.dataset.stackGroup, 10);
+        var ii = parseInt(btn.dataset.stackItem, 10);
+        if (isNaN(gi) || isNaN(ii)) return;
+        SFX.tap();
+        openStackOverlay(gi, ii);
+      });
+    }
+    if (stackOverlay) {
+      stackOverlay.addEventListener("click", function (e) {
+        if (e.target === stackOverlay) {
+          closeStackOverlay(true);
+        }
+      });
+    }
+    if (stackOverlayClose) {
+      stackOverlayClose.addEventListener("click", function () {
+        closeStackOverlay(true);
+      });
+    }
+
     // Sound segmented switch (inside settings)
     document.querySelectorAll(".sound-opt").forEach(function (btn) {
       btn.addEventListener("click", function () {
@@ -2115,6 +2210,11 @@
     // Keyboard shortcuts (vim / linux nerd friendly!)
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape") {
+        var stackOv = document.getElementById("stackOverlay");
+        if (stackOv && !stackOv.hidden) {
+          closeStackOverlay(true);
+          return;
+        }
         var menuOv = document.getElementById("menuOverlay");
         if (menuOv && !menuOv.hidden) {
           closeMenu(true);

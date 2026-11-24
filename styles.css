@@ -462,7 +462,8 @@ code {
   display: none;
 }
 
-body.settings-open {
+body.settings-open,
+body.stack-overlay-open {
   overflow: hidden;
 }
 
@@ -2447,18 +2448,110 @@ body.menu-open {
   font-family: var(--font-mono);
   font-size: 0.8rem;
   color: var(--fg1);
-  transition: border-color 0.16s, transform 0.14s var(--ease);
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  text-align: left;
+  line-height: inherit;
+  transition: border-color 0.16s, transform 0.14s var(--ease), background 0.16s;
 }
 
-.stack-item:hover {
+.stack-item:hover,
+.stack-item:focus-visible {
   border-color: var(--card-accent, var(--yellow));
+  background: var(--bg-card);
   transform: translateY(-1px);
+  outline: none;
+}
+
+.stack-item:focus-visible {
+  box-shadow: 0 0 0 2px var(--bg-card), 0 0 0 4px var(--card-accent, var(--yellow));
 }
 
 .stack-item svg {
   width: 15px;
   height: 15px;
   color: var(--card-accent, var(--yellow));
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   STACK DETAIL OVERLAY
+   ========================================================================== */
+.stack-detail-card {
+  width: min(460px, 100%);
+}
+
+.stack-detail-title {
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.stack-detail-title > span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stack-detail-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  background: var(--bg1);
+  border: 1px solid var(--bg2);
+  color: var(--yellow);
+  flex-shrink: 0;
+}
+
+.stack-detail-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.stack-detail-desc {
+  margin: 14px 0 0;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--fg2);
+}
+
+.stack-detail-link {
+  margin-top: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--bg2);
+  background: var(--bg1);
+  color: var(--fg0);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: border-color 0.16s, transform 0.14s var(--ease), background 0.16s, color 0.16s;
+}
+
+.stack-detail-link:hover,
+.stack-detail-link:focus-visible {
+  border-color: var(--yellow);
+  background: var(--bg-card);
+  color: var(--yellow);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.stack-detail-link:focus-visible {
+  box-shadow: 0 0 0 2px var(--bg-card), 0 0 0 4px var(--yellow);
+}
+
+.stack-detail-link svg {
+  width: 15px;
+  height: 15px;
   flex-shrink: 0;
 }
 
