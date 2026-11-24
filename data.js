@@ -198,6 +198,11 @@ const SITE_DATA = {
         langNote: "переключается и клавишей L",
         close: "закрыть"
       },
+      menu: {
+        tooltip: "меню разделов",
+        title: "разделы",
+        close: "закрыть"
+      },
       hero: {
         badge: "i use arch btw",
         greeting: "привет, я димас ботяра.",
@@ -496,6 +501,11 @@ const SITE_DATA = {
         off: "off",
         langTitle: "language",
         langNote: "or just press L",
+        close: "close"
+      },
+      menu: {
+        tooltip: "sections menu",
+        title: "sections",
         close: "close"
       },
       hero: {

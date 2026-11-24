@@ -363,6 +363,27 @@
     if (restoreFocus && btn) btn.focus();
   }
 
+  function openMenu() {
+    var overlay = document.getElementById("menuOverlay");
+    var btn = document.getElementById("menuToggle");
+    if (!overlay) return;
+    overlay.hidden = false;
+    if (btn) btn.setAttribute("aria-expanded", "true");
+    document.body.classList.add("menu-open");
+    var closeBtn = document.getElementById("menuClose");
+    if (closeBtn) closeBtn.focus();
+  }
+
+  function closeMenu(restoreFocus) {
+    var overlay = document.getElementById("menuOverlay");
+    var btn = document.getElementById("menuToggle");
+    if (!overlay || overlay.hidden) return;
+    overlay.hidden = true;
+    if (btn) btn.setAttribute("aria-expanded", "false");
+    document.body.classList.remove("menu-open");
+    if (restoreFocus && btn) btn.focus();
+  }
+
   function setTheme(themeId, persist, withSound) {
     var themeObj = getThemeObj(themeId);
     state.theme = themeObj.id;
@@ -414,6 +435,10 @@
     if (settingsBtn) settingsBtn.setAttribute("title", t("settings.tooltip"));
     var settingsClose = document.getElementById("settingsClose");
     if (settingsClose) settingsClose.setAttribute("aria-label", t("settings.close"));
+    var menuBtn = document.getElementById("menuToggle");
+    if (menuBtn) menuBtn.setAttribute("title", t("menu.tooltip"));
+    var menuCloseBtn = document.getElementById("menuClose");
+    if (menuCloseBtn) menuCloseBtn.setAttribute("aria-label", t("menu.close"));
     var soundSwitch = document.getElementById("soundSwitch");
     if (soundSwitch) soundSwitch.setAttribute("title", state.sound ? t("soundOnTooltip") : t("soundOffTooltip"));
     var langSwitch = document.getElementById("langSwitch");
@@ -2020,6 +2045,37 @@
       });
     }
 
+    // Mobile section menu overlay
+    var menuToggle = document.getElementById("menuToggle");
+    var menuOverlay = document.getElementById("menuOverlay");
+    var menuCloseBtn = document.getElementById("menuClose");
+    if (menuToggle && menuOverlay) {
+      menuToggle.addEventListener("click", function () {
+        if (menuOverlay.hidden) {
+          openMenu();
+        } else {
+          closeMenu(true);
+        }
+      });
+
+      menuOverlay.addEventListener("click", function (e) {
+        if (e.target === menuOverlay) {
+          closeMenu(true);
+        }
+      });
+
+      menuOverlay.querySelectorAll(".menu-link").forEach(function (link) {
+        link.addEventListener("click", function () {
+          closeMenu(false);
+        });
+      });
+    }
+    if (menuCloseBtn) {
+      menuCloseBtn.addEventListener("click", function () {
+        closeMenu(true);
+      });
+    }
+
     // Sound segmented switch (inside settings)
     document.querySelectorAll(".sound-opt").forEach(function (btn) {
       btn.addEventListener("click", function () {
@@ -2059,7 +2115,12 @@
     // Keyboard shortcuts (vim / linux nerd friendly!)
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape") {
-        closeSettings(true);
+        var menuOv = document.getElementById("menuOverlay");
+        if (menuOv && !menuOv.hidden) {
+          closeMenu(true);
+        } else {
+          closeSettings(true);
+        }
         return;
       }
       var tag = document.activeElement && document.activeElement.tagName;
