@@ -418,13 +418,13 @@ const SITE_DATA = {
           title: "языки",
           accent: "yellow",
           items: [
-            { name: "python", icon: "python" },
-            { name: "javascript", icon: "js" },
-            { name: "bash / fish", icon: "terminal" },
-            { name: "html & css", icon: "code" },
-            { name: "c++17", icon: "cpp" },
-            { name: "rust (tauri)", icon: "rust" },
-            { name: "markdown", icon: "doc" }
+            { name: "python", icon: "python", url: "https://www.python.org/", desc: "язык, на котором я пишу большую часть своих проектов — от игр до веб-приложений." },
+            { name: "javascript", icon: "js", url: "https://developer.mozilla.org/docs/Web/JavaScript", desc: "язык веба: оживляет интерфейсы и логику прямо в браузере." },
+            { name: "bash / fish", icon: "terminal", url: "https://fishshell.com/", desc: "командные оболочки для скриптов, автоматизации и повседневной работы в терминале." },
+            { name: "html & css", icon: "code", url: "https://developer.mozilla.org/docs/Web/HTML", desc: "основа веб-страниц: структура на HTML и стили/разметка на CSS." },
+            { name: "c++17", icon: "cpp", url: "https://isocpp.org/", desc: "быстрый системный язык для производительных и тяжёлых задач." },
+            { name: "rust", icon: "rust", url: "https://www.rust-lang.org/", desc: "системный язык с упором на безопасность памяти и высокую производительность." },
+            { name: "markdown", icon: "doc", url: "https://daringfireball.net/projects/markdown/", desc: "лёгкий язык разметки для документации, заметок и README." }
           ]
         },
         {
@@ -432,13 +432,14 @@ const SITE_DATA = {
           title: "движки и библиотеки",
           accent: "aqua",
           items: [
-            { name: "pygame / pygame-ce", icon: "gamepad" },
-            { name: "flask + socket.io", icon: "server" },
-            { name: "pyqt5 / pyqt6", icon: "window" },
-            { name: "sqlite", icon: "db" },
-            { name: "pytorch", icon: "spark" },
-            { name: "godot", icon: "cube" },
-            { name: "rich tui", icon: "palette" }
+            { name: "pygame / pygame-ce", icon: "gamepad", url: "https://pyga.me/", desc: "Python-библиотеки для создания 2D-игр и интерактивных приложений." },
+            { name: "flask", icon: "flask", url: "https://flask.palletsprojects.com/", desc: "лёгкий Python-фреймворк для веб-приложений и API." },
+            { name: "socket.io", icon: "socketio", url: "https://socket.io/", desc: "библиотека для realtime-обмена событиями между клиентом и сервером." },
+            { name: "pyqt5 / pyqt6", icon: "window", url: "https://www.riverbankcomputing.com/software/pyqt/", desc: "биндинги Qt для создания десктопных GUI-приложений на Python." },
+            { name: "sqlite", icon: "db", url: "https://www.sqlite.org/", desc: "встраиваемая файловая база данных без отдельного сервера." },
+            { name: "pytorch", icon: "spark", url: "https://pytorch.org/", desc: "фреймворк для машинного обучения и нейросетей." },
+            { name: "godot", icon: "cube", url: "https://godotengine.org/", desc: "открытый игровой движок для 2D и 3D игр." },
+            { name: "rich tui", icon: "palette", url: "https://github.com/Textualize/rich", desc: "Python-библиотека для красивых текстовых интерфейсов в терминале." }
           ]
         },
         {
@@ -446,16 +447,22 @@ const SITE_DATA = {
           title: "система и быт",
           accent: "green",
           items: [
-            { name: "arch linux", icon: "arch" },
-            { name: "cachyos", icon: "linux" },
-            { name: "git & github", icon: "git" },
-            { name: "pycharm", icon: "ide" },
-            { name: "obsidian", icon: "note" },
-            { name: "pipewire & ffmpeg", icon: "audio" },
-            { name: "discord", icon: "chat" }
+            { name: "arch linux", icon: "arch", url: "https://archlinux.org/", desc: "минималистичный rolling-release дистрибутив Linux, который настраиваешь под себя." },
+            { name: "cachyos", icon: "linux", url: "https://cachyos.org/", desc: "оптимизированный дистрибутив на базе Arch Linux с фокусом на производительность." },
+            { name: "git & github", icon: "git", url: "https://github.com/", desc: "Git — контроль версий, GitHub — платформа для хостинга и совместной работы над кодом." },
+            { name: "pycharm", icon: "ide", url: "https://www.jetbrains.com/pycharm/", desc: "IDE от JetBrains для разработки на Python." },
+            { name: "obsidian", icon: "note", url: "https://obsidian.md/", desc: "приложение для Markdown-заметок с локальным хранилищем и связями между ними." },
+            { name: "pipewire", icon: "pipewire", url: "https://pipewire.org/", desc: "современный мультимедийный сервер для аудио и видео в Linux." },
+            { name: "ffmpeg", icon: "ffmpeg", url: "https://ffmpeg.org/", desc: "набор инструментов для обработки, конвертации и стриминга аудио/видео." },
+            { name: "discord", icon: "chat", url: "https://discord.com/", desc: "мессенджер для общения, сообществ и голосовых звонков." }
           ]
         }
       ],
+      stackOverlay: {
+        visitSite: "официальный сайт",
+        close: "закрыть",
+        ariaLabel: "подробнее о технологии"
+      },
       footer: {
         madeWith: "сделано с 💜 и любовью к gruvbox",
         shortcuts: "[t] тема · [l] язык · [/] поиск",
@@ -723,13 +730,13 @@ const SITE_DATA = {
           title: "languages",
           accent: "yellow",
           items: [
-            { name: "python", icon: "python" },
-            { name: "javascript", icon: "js" },
-            { name: "bash / fish", icon: "terminal" },
-            { name: "html & css", icon: "code" },
-            { name: "c++17", icon: "cpp" },
-            { name: "rust (tauri)", icon: "rust" },
-            { name: "markdown", icon: "doc" }
+            { name: "python", icon: "python", url: "https://www.python.org/", desc: "The language I use for most of my projects — from games to web apps." },
+            { name: "javascript", icon: "js", url: "https://developer.mozilla.org/docs/Web/JavaScript", desc: "The language of the web: powers interactive UI and logic in the browser." },
+            { name: "bash / fish", icon: "terminal", url: "https://fishshell.com/", desc: "Command shells for scripting, automation, and everyday terminal work." },
+            { name: "html & css", icon: "code", url: "https://developer.mozilla.org/docs/Web/HTML", desc: "The foundation of web pages: structure with HTML and styling/layout with CSS." },
+            { name: "c++17", icon: "cpp", url: "https://isocpp.org/", desc: "A fast systems language for performance-heavy tasks." },
+            { name: "rust", icon: "rust", url: "https://www.rust-lang.org/", desc: "A systems language focused on memory safety and high performance." },
+            { name: "markdown", icon: "doc", url: "https://daringfireball.net/projects/markdown/", desc: "A lightweight markup language for docs, notes, and READMEs." }
           ]
         },
         {
@@ -737,13 +744,14 @@ const SITE_DATA = {
           title: "engines & libs",
           accent: "aqua",
           items: [
-            { name: "pygame / pygame-ce", icon: "gamepad" },
-            { name: "flask + socket.io", icon: "server" },
-            { name: "pyqt5 / pyqt6", icon: "window" },
-            { name: "sqlite", icon: "db" },
-            { name: "pytorch", icon: "spark" },
-            { name: "godot", icon: "cube" },
-            { name: "rich tui", icon: "palette" }
+            { name: "pygame / pygame-ce", icon: "gamepad", url: "https://pyga.me/", desc: "Python libraries for building 2D games and interactive apps." },
+            { name: "flask", icon: "flask", url: "https://flask.palletsprojects.com/", desc: "A lightweight Python framework for web apps and APIs." },
+            { name: "socket.io", icon: "socketio", url: "https://socket.io/", desc: "A library for realtime event-based communication between client and server." },
+            { name: "pyqt5 / pyqt6", icon: "window", url: "https://www.riverbankcomputing.com/software/pyqt/", desc: "Qt bindings for building desktop GUI apps in Python." },
+            { name: "sqlite", icon: "db", url: "https://www.sqlite.org/", desc: "An embedded file-based database with no separate server." },
+            { name: "pytorch", icon: "spark", url: "https://pytorch.org/", desc: "A framework for machine learning and neural networks." },
+            { name: "godot", icon: "cube", url: "https://godotengine.org/", desc: "An open-source game engine for 2D and 3D games." },
+            { name: "rich tui", icon: "palette", url: "https://github.com/Textualize/rich", desc: "A Python library for beautiful text interfaces in the terminal." }
           ]
         },
         {
@@ -751,16 +759,22 @@ const SITE_DATA = {
           title: "os & daily gear",
           accent: "green",
           items: [
-            { name: "arch linux", icon: "arch" },
-            { name: "cachyos", icon: "linux" },
-            { name: "git & github", icon: "git" },
-            { name: "pycharm", icon: "ide" },
-            { name: "obsidian", icon: "note" },
-            { name: "pipewire & ffmpeg", icon: "audio" },
-            { name: "discord", icon: "chat" }
+            { name: "arch linux", icon: "arch", url: "https://archlinux.org/", desc: "A minimalist rolling-release Linux distro you shape to your needs." },
+            { name: "cachyos", icon: "linux", url: "https://cachyos.org/", desc: "An Arch-based distro optimized for performance." },
+            { name: "git & github", icon: "git", url: "https://github.com/", desc: "Git for version control, GitHub for hosting and collaborating on code." },
+            { name: "pycharm", icon: "ide", url: "https://www.jetbrains.com/pycharm/", desc: "A JetBrains IDE for Python development." },
+            { name: "obsidian", icon: "note", url: "https://obsidian.md/", desc: "A Markdown notes app with local storage and linked notes." },
+            { name: "pipewire", icon: "pipewire", url: "https://pipewire.org/", desc: "A modern multimedia server for audio and video on Linux." },
+            { name: "ffmpeg", icon: "ffmpeg", url: "https://ffmpeg.org/", desc: "A powerful toolkit for processing, converting, and streaming audio/video." },
+            { name: "discord", icon: "chat", url: "https://discord.com/", desc: "A messenger for chats, communities, and voice calls." }
           ]
         }
       ],
+      stackOverlay: {
+        visitSite: "official website",
+        close: "close",
+        ariaLabel: "technology details"
+      },
       footer: {
         madeWith: "made with 💜 and gruvbox",
         shortcuts: "[t] theme · [l] lang · [/] search",
